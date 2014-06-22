@@ -1,5 +1,5 @@
 set(LTO_FLAGS "-fno-rtti -fPIE")
-set(CMAKE_CXX_FLAGS "-Wall -Wextra -std=c++11 -pedantic")
+set(CMAKE_CXX_FLAGS "-Wall -Wextra -Werror -std=c++11 -pedantic")
 set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g")
 set(CMAKE_CXX_FLAGS_MINSIZEREL "-Os -DNDEBUG -march=native ${LTO_FLAGS}")
 set(CMAKE_CXX_FLAGS_RELEASE "-Ofast -DNDEBUG -march=native ${LTO_FLAGS}")
