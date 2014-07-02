@@ -9,7 +9,7 @@
 
 namespace
 {
-typedef detail_inv::CoordGeneric<int> Coord;
+using Coord = detail_inv::CoordGeneric<int>;
 constexpr int delta{2};
 } // end of anonymous namespace
 
