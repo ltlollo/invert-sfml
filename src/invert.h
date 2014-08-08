@@ -13,9 +13,7 @@
 namespace inv {
 
 constexpr char title[]{"invert-sfml"};
-constexpr unsigned aliasLvl{8};
-constexpr unsigned xWinSize{1900}, yWinSize{1600};
-constexpr unsigned quality{100};
+constexpr unsigned aliasLvl{8}, quality{100};
 
 using Coord = sf::Vector2f;
 
@@ -41,11 +39,13 @@ private:
 
 public:
     Inverter(const std::string& iname, const std::string& oname,
-             const Coord center, const int radius);
-    Inverter(const std::string& iname, const Coord center, const int radius);
-    Inverter(const std::string& iname);
+             const Coord center, const int radius, bool show=false);
+    Inverter(const std::string& iname, const Coord center, const int radius,
+             const bool show = false);
+    Inverter(const std::string& iname, const std::string& oname,
+             const bool show = false);
+    explicit Inverter(const std::string& iname, const bool show = false);
     void run();
-    void operator()();
     void set_center(const Coord p) noexcept; // TODO: make setters safe/sane
     Coord get_center() const noexcept;
     void set_radius(const int d) noexcept;

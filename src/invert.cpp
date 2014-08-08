@@ -52,7 +52,7 @@ void Inverter::invert_points() noexcept {
         for (size_t y{1}; y < orig_png.getSize().y; ++y) {
             if (x != center.x+1 || x != center.x-1 ||
                 y != center.y+1 || y != center.y-1 ||
-                x != center.x || y != center.y)  {
+                x != center.x   || y != center.y)  {
                 color_region(Coord(x, y));
             }
         }
@@ -70,37 +70,38 @@ size_t Inverter::find_max_radiussq() const noexcept {
     return rsq*rsq/(2*(max+2)*(max+2));
 }
 
-sf::Color Inverter::get_background() const noexcept {
+Color Inverter::get_background() const noexcept {
     const size_t x  = orig_png.getSize().x/2, y = orig_png.getSize().x/2;
-    auto ca = orig_png.getPixel(0, y),
+    const auto ca = orig_png.getPixel(0, y),
             cb = orig_png.getPixel(x, 0),
             cc = orig_png.getPixel(orig_png.getSize().x-1, y),
             cd = orig_png.getPixel(x, orig_png.getSize().y-1);
-    sf::Color avg(ca.r/4+cb.r/4+cc.r/4+cd.r/4,
-                  ca.g/4+cb.g/4+cc.g/4+cd.g/4,
-                  ca.b/4+cb.b/4+cc.b/4+cd.b/4);
+    Color avg(ca.r/4+cb.r/4+cc.r/4+cd.r/4,
+              ca.g/4+cb.g/4+cc.g/4+cd.g/4,
+              ca.b/4+cb.b/4+cc.b/4+cd.b/4);
     return avg;
 }
 
-Inverter::Inverter(const std::string& iname, const std::string& oname,
-                   const Coord center, const int radius)
+Inverter::Inverter(const string& iname, const string& oname,
+                   const Coord center, const int radius, const bool show)
     : iname(iname), oname(oname), radius(radius), center(center),
-      rsq(radius*radius), settings(0, 0, aliasLvl, 3, 0),
-      window{{xWinSize, yWinSize}, title, Style::None, settings} {
-
+      rsq(radius*radius), settings(0, 0, aliasLvl, 3, 0), show{show} {
     orig_png.loadFromFile(iname);
-    VideoMode vmode(orig_png.getSize().x, orig_png.getSize().y);
-    window.create(vmode, title);
     gtmodsq_maps_outside = find_max_radiussq();
 }
 
-Inverter::Inverter(const std::string& iname, const Coord center,
-                   const int radius)
-    : Inverter(iname, iname+"-out.png", center, radius)
+Inverter::Inverter(const string& iname, const bool show)
+    :  Inverter(iname, iname+"-out.png", show)
 {}
 
-Inverter::Inverter(const std::string& iname)
-    : Inverter(iname, iname+"-out.png", Coord(0,0), 0) {
+Inverter::Inverter(const string& iname, const Coord center,
+                   const int radius, const bool show)
+    : Inverter(iname, iname+"-out.png", center, radius, show)
+{}
+
+Inverter::Inverter(const string& iname, const string& oname,
+                   const bool show)
+    : Inverter(iname, oname, Coord(0,0), 0, show) {
     center.x = orig_png.getSize().x/2;
     center.y = orig_png.getSize().y/2;
     radius = (center.x > center.y ? center.y/2 : center.x/2);
@@ -109,6 +110,9 @@ Inverter::Inverter(const std::string& iname)
 }
 
 void Inverter::run() {
+    VideoMode vmode(orig_png.getSize().x, orig_png.getSize().y);
+    window.create(vmode, title);
+    window.create(vmode, title);    // HACK: sfml needs this to work properly
     window.clear(get_background());
     window.setVisible(show);
     invert_points();
@@ -121,6 +125,15 @@ void Inverter::run() {
             while (window.pollEvent(event)) {
                 if (event.type == Event::Closed) {
                     window.close();
+                } else if (event.type == Event::KeyPressed) {
+                    switch (event.key.code) {
+                    case Keyboard::Q:
+                    case Keyboard::Escape:
+                        window.close();
+                        break;
+                    default:
+                        break;
+                    }
                 }
             }
             window.display();
@@ -128,10 +141,6 @@ void Inverter::run() {
     } else {
         window.capture().saveToFile(oname);
     }
-}
-
-void Inverter::operator()() {
-    run();
 }
 
 void Inverter::set_center(const Coord p) noexcept {
