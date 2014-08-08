@@ -1,6 +1,4 @@
-invert-png
+invert-sfml
 ==========
 
-inverts the coordinate system
-
-[![Preview](http://img.youtube.com/vi/N9SpE14NE2A/0.jpg)](https://www.youtube.com/watch?v=N9SpE14NE2A)
+Based on invert-png. A "I don't know if I'll have internet at the beach" 0.0 release.

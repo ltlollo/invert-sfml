@@ -1,76 +1,56 @@
 #ifndef INVERT_H
 #define INVERT_H
 
-#include <stdexcept>       // std::runtime_error
-#include <tuple>           // std::tuple
-#include <cmath>           // std::atan2, std::sincos [long]double->T
-#include <png++/png.hpp>   // png::image
-#include "invert_detail.h" // detail_inv::CoordGeneric
+#include <vector>
+#include <stdexcept>     // std::runtime_error
+#include <cmath>         // atan2, sincos [long]double->T
+#include <iostream>
 
-namespace
-{
-using Coord = detail_inv::CoordGeneric<int>;
-constexpr int delta{2};
-} // end of anonymous namespace
+#include <SFML/Audio.hpp>
+#include <SFML/Graphics.hpp>
+#include <SFML/OpenGL.hpp>
 
-namespace inv
-{
+namespace inv {
 
-class Inverter
-{
+constexpr char title[]{"invert-sfml"};
+constexpr unsigned aliasLvl{8};
+constexpr unsigned xWinSize{1900}, yWinSize{1600};
+constexpr unsigned quality{100};
+
+using Coord = sf::Vector2f;
+
+class Inverter {
 private:
     const std::string iname, oname;
-    const png::image<png::rgb_pixel> orig_png;
-    mutable png::image<png::rgb_pixel> new_png;
+    sf::Image orig_png;
     int radius;
     Coord center;
     std::size_t rsq;
     std::size_t gtmodsq_maps_outside;
+    const sf::ContextSettings settings;
+    sf::RenderWindow window;
+    sf::Event event;
+    std::vector<sf::Vertex> vertices;
+    const bool show{false};
 
-    bool outside_inv_circle(const Coord p) const noexcept;
-    double dir(const Coord a, const Coord b, const Coord c) const noexcept;
-    bool in_trinagle(const Coord p,
-                     const Coord a,
-                     const Coord b,
-                     const Coord c
-                    ) const noexcept;
-
-    bool in_rectangle(const Coord p,
-                      const Coord a,
-                      const Coord b,
-                      const Coord c,
-                      const Coord d
-                     ) const noexcept;
-    template<typename T> std::tuple<T, T, T, T>
-    min_max_x_y(const detail_inv::CoordGeneric<T> a,
-                const detail_inv::CoordGeneric<T> b,
-                const detail_inv::CoordGeneric<T> c,
-                const detail_inv::CoordGeneric<T> d
-               ) const noexcept;
-    template<typename T> double
-    get_angle(const detail_inv::CoordGeneric<T> rel_p) const noexcept;
-    Coord invert_abs_coord(const Coord p) const noexcept;
-    template <typename T> T avg_pixel(T f, T s) const noexcept;
+    inline Coord invert_abs_coord(const Coord p) const noexcept;
     void color_region(const Coord curr) noexcept;
     void invert_points() noexcept;
     std::size_t find_max_radiussq() const noexcept;
+    sf::Color get_background() const noexcept;
 
 public:
     Inverter(const std::string& iname, const std::string& oname,
-             const Coord center, const int radius
-            );
+             const Coord center, const int radius);
     Inverter(const std::string& iname, const Coord center, const int radius);
-    explicit Inverter(const std::string& iname);
+    Inverter(const std::string& iname);
     void run();
     void operator()();
-    void set_center(const Coord p); // TODO: make setters safe/sane
-    void set_radius(const int d);
+    void set_center(const Coord p) noexcept; // TODO: make setters safe/sane
     Coord get_center() const noexcept;
+    void set_radius(const int d) noexcept;
     int get_radius() const noexcept;
 };
 
-#include "invert_impl.h"
-
-} // end of inv namespace
-
+}
 #endif // INVERT_H

@@ -3,11 +3,13 @@
 
 #include <tuple> // std::tuple, std::make_tuple
 
-template<typename T> inline std::tuple<T, T, T, T>
-Inverter::min_max_x_y(const detail_inv::CoordGeneric<T> a,
-                      const detail_inv::CoordGeneric<T> b,
-                      const detail_inv::CoordGeneric<T> c,
-                      const detail_inv::CoordGeneric<T> d
+using namespace detail_inv;
+
+template<typename T> std::tuple<T, T, T, T>
+Inverter::min_max_x_y(const CoordGeneric<T> a,
+                      const CoordGeneric<T> b,
+                      const CoordGeneric<T> c,
+                      const CoordGeneric<T> d
                      ) const noexcept
 {
     T min_x{a.x}, max_x{a.x}, min_y{a.y}, max_y{a.y};
@@ -26,11 +28,7 @@ Inverter::min_max_x_y(const detail_inv::CoordGeneric<T> a,
     return std::make_tuple(min_x, max_x, min_y, max_y);
 }
 
-template <typename T> inline T Inverter::avg_pixel(T f, T s) const noexcept
+template <typename T> T Inverter::avg_pixel(T f, T s) const noexcept
 { return T(f.red/2 + s.red/2, f.green/2 + s.green/2, f.blue/2 + s.blue/2); }
-
-template <typename T> inline double
-Inverter::get_angle(const detail_inv::CoordGeneric<T> rel_p) const noexcept
-{ return atan2(rel_p.y, rel_p.x); }
 
 #endif // INVERT_IMPL_H
