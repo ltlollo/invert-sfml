@@ -39,18 +39,20 @@ array<int, 3> parse_coord(const string& opt) {
 
 int main(int argc, char* argv[]) {
     const auto print_help=[&]() {
-        cerr << "Usage: " << argv[0] << " IN [[OUT] X Y R]\n"
-                "Scope: invert the space such that the polar coordinate system"
-                "\n\tcentered in (X,Y) {r, θ} becomes {r' = R^2/r, θ' = θ}\n"
-                " IN(string):"
+        cerr << "Usage:\t" << argv[0]
+             << " -i input [-o output] [-s] [-h] [-c coord]\n"
+                "Scope:\tinvert the space such that the polar coordinate system"
+                " centered in (X,Y) {r, θ} becomes {r' = R^2/r, θ' = θ}\n"
+                "Flags:\t-input(string):"
                 " the image file to invert (:png)\n"
-                " OUT(string, defaults \"out-\"in):"
-                " the output file (:overwrites)\n"
-                " X(int, defaults width/2):"
+                "\t-output(string, defaults to \"out-\"input):"
+                "\tthe output file (:overwrites if exists)\n"
+                "\t-coord: X,Y,R\n"
+                "\t\t-X(int, defaults width/2):"
                 " the x coordinate of the center of inversion\n"
-                " Y(int, defaults height/2):"
+                "\t\t-Y(int, defaults height/2):"
                 " the y coordinate of the center of inversion\n"
-                " R(int, defaults min(X,Y)/2):"
+                "\t\t-R(int, defaults min(X,Y)/2):"
                 " the radius of the circle of inversion"
              << endl;
     };
