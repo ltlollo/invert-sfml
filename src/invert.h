@@ -2,13 +2,12 @@
 #define INVERT_H
 
 #include <vector>
-#include <stdexcept>     // std::runtime_error
-#include <cmath>         // atan2, sincos [long]double->T
+#include <stdexcept>
+#include <cmath>
 #include <iostream>
 
 #include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>
-#include <SFML/OpenGL.hpp>
 
 namespace inv {
 
@@ -36,6 +35,7 @@ private:
     void invert_points() noexcept;
     std::size_t find_max_radiussq() const noexcept;
     sf::Color get_background() const noexcept;
+    void present_image();
 
 public:
     Inverter(const std::string& iname, const std::string& oname,

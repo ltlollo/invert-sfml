@@ -13,46 +13,44 @@ inline Coord Inverter::invert_abs_coord(const Coord p) const noexcept {
 }
 
 void Inverter::color_region(const Coord curr) noexcept {
-    if ((curr.x-center.x)*(curr.x-center.x)+(curr.y-center.y)*(curr.y-center.y)
-        >= gtmodsq_maps_outside) {
-        const Coord p = invert_abs_coord(Coord(curr.x, curr.y)),
-                a = invert_abs_coord(Coord(curr.x-1, curr.y-1)), // ab
-                b = invert_abs_coord(Coord(curr.x, curr.y-1)),   // cp
-                c = invert_abs_coord(Coord(curr.x-1, curr.y));
-        Vertex vp, va, vb, vc;
-        vp.position = p; vp.color = orig_png.getPixel(curr.x, curr.y);
-        va.position = a; va.color = orig_png.getPixel(curr.x-1, curr.y-1);
-        vb.position = b; vb.color = orig_png.getPixel(curr.x, curr.y-1);
-        vc.position = c; vc.color = orig_png.getPixel(curr.x-1, curr.y);
+    const Coord
+            a = invert_abs_coord(Coord(curr.x-1, curr.y-1)), // ab
+            b = invert_abs_coord(Coord(curr.x, curr.y-1)),   // cp
+            c = invert_abs_coord(Coord(curr.x-1, curr.y)),
+            p = invert_abs_coord(Coord(curr.x, curr.y));
 
-        vertices.push_back(vb);
-        vertices.push_back(vc);
+    Vertex vp, va, vb, vc;
+    vp.position = p; vp.color = orig_png.getPixel(curr.x, curr.y);
+    va.position = a; va.color = orig_png.getPixel(curr.x-1, curr.y-1);
+    vb.position = b; vb.color = orig_png.getPixel(curr.x, curr.y-1);
+    vc.position = c; vc.color = orig_png.getPixel(curr.x-1, curr.y);
+
+    vertices.push_back(vb);
+    vertices.push_back(vc);
+    vertices.push_back(va);
+
+    if (quality>0) {
         vertices.push_back(va);
-
-        if (quality>0) {
-            vertices.push_back(va);
-            vertices.push_back(vp);
-            vertices.push_back(vb);
-        }
-
-        vertices.push_back(vb);
-        vertices.push_back(vc);
         vertices.push_back(vp);
+        vertices.push_back(vb);
+    }
 
-        if (quality>0) {
-            vertices.push_back(va);
-            vertices.push_back(vp);
-            vertices.push_back(vc);
-        }
+    vertices.push_back(vb);
+    vertices.push_back(vc);
+    vertices.push_back(vp);
+
+    if (quality>0) {
+        vertices.push_back(va);
+        vertices.push_back(vp);
+        vertices.push_back(vc);
     }
 }
 
 void Inverter::invert_points() noexcept {
     for (size_t x{1}; x < orig_png.getSize().x; ++x) {
         for (size_t y{1}; y < orig_png.getSize().y; ++y) {
-            if (x != center.x+1 || x != center.x-1 ||
-                y != center.y+1 || y != center.y-1 ||
-                x != center.x   || y != center.y)  {
+            if ((x != center.x+1 || y != center.y+1 || x != center.x || y != center.y) &&
+                (x-center.x)*(x-center.x)+(y-center.y)*(y-center.y) >= gtmodsq_maps_outside)  {
                 color_region(Coord(x, y));
             }
         }
@@ -60,11 +58,9 @@ void Inverter::invert_points() noexcept {
 }
 
 size_t Inverter::find_max_radiussq() const noexcept {
-    const size_t max_x = center.x >=
-                         (orig_png.getSize().x-1)/2 ?
+    const size_t max_x = center.x >= (orig_png.getSize().x-1)/2 ?
                              center.x : orig_png.getSize().x-1 - center.x;
-    const size_t max_y = center.y >=
-                         (orig_png.getSize().y-1)/2 ?
+    const size_t max_y = center.y >= (orig_png.getSize().y-1)/2 ?
                              center.y : orig_png.getSize().y-1 - center.y;
     const size_t max = max_x >= max_y ? max_x : max_y;
     return rsq*rsq/(2*(max+2)*(max+2));
@@ -80,6 +76,27 @@ Color Inverter::get_background() const noexcept {
               ca.g/4+cb.g/4+cc.g/4+cd.g/4,
               ca.b/4+cb.b/4+cc.b/4+cd.b/4);
     return avg;
+}
+
+void Inverter::present_image() {
+    window.setFramerateLimit(20);
+    while (window.isOpen()) {
+        while (window.pollEvent(event)) {
+            if (event.type == Event::Closed) {
+                window.close();
+            } else if (event.type == Event::KeyPressed) {
+                switch (event.key.code) {
+                case Keyboard::Q:
+                case Keyboard::Escape:
+                    window.close();
+                    break;
+                default:
+                    break;
+                }
+            }
+        }
+        window.display();
+    }
 }
 
 Inverter::Inverter(const string& iname, const string& oname,
@@ -120,24 +137,7 @@ void Inverter::run() {
         window.draw(&vertices[i*3], 3, Triangles);
     }
     if (show) {
-        window.setFramerateLimit(20);
-        while (window.isOpen()) {
-            while (window.pollEvent(event)) {
-                if (event.type == Event::Closed) {
-                    window.close();
-                } else if (event.type == Event::KeyPressed) {
-                    switch (event.key.code) {
-                    case Keyboard::Q:
-                    case Keyboard::Escape:
-                        window.close();
-                        break;
-                    default:
-                        break;
-                    }
-                }
-            }
-            window.display();
-        }
+        present_image();
     } else {
         window.capture().saveToFile(oname);
     }
