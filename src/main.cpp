@@ -40,7 +40,7 @@ array<int, 3> parse_coord(const string& opt) {
 int main(int argc, char* argv[]) {
     const auto print_help=[&]() {
         cerr << "Usage:\t" << argv[0]
-             << " -i input [-o output] [-s] [-h] [-c coord]\n"
+             << " -i input [-o output|-s] [-h] [-c coord]\n"
                 "Scope:\tinvert the space such that the polar coordinate system"
                 " centered in (X,Y) {r, θ} becomes {r' = R^2/r, θ' = θ}\n"
                 "Flags:\t-input(string):"
