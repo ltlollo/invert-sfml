@@ -35,7 +35,7 @@ private:
     void invert_points() noexcept;
     std::size_t find_max_radiussq() const noexcept;
     sf::Color get_background() const noexcept;
-    void present_image();
+    void show_image();
 
 public:
     Inverter(const std::string& iname, const std::string& oname,

@@ -78,7 +78,7 @@ Color Inverter::get_background() const noexcept {
     return avg;
 }
 
-void Inverter::present_image() {
+void Inverter::show_image() {
     window.setFramerateLimit(20);
     while (window.isOpen()) {
         while (window.pollEvent(event)) {
@@ -137,7 +137,7 @@ void Inverter::run() {
         window.draw(&vertices[i*3], 3, Triangles);
     }
     if (show) {
-        present_image();
+        show_image();
     } else {
         window.capture().saveToFile(oname);
     }
