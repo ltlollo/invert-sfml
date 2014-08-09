@@ -87,7 +87,7 @@ int main(int argc, char* argv[]) {
         }
     }
     if ((outopt && oname.empty()) || !inopt || iname.empty() ||
-        (showopt && outopt)) {
+        (showopt && outopt) || optind != argc ) {
         print_help();
         return 1;
     }
