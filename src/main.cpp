@@ -23,7 +23,6 @@ int main(int argc, char* argv[]) {
                 " the radius of the circle of inversion"
              << endl;
     };
-
     string oname, iname;
     array<int, 3> xyr;
     bool outopt{false}, showopt{false}, inopt{false}, coordopt{false};

@@ -15,6 +15,13 @@ constexpr auto split_equally(const size_t load, const size_t id,
                 load/nworkers + 1 : load/nworkers;
 }
 
+constexpr size_t past_load(const size_t load, const size_t id,
+                           const size_t nworkers) {
+    return id ? past_load(load, id-1, nworkers) +
+                range::split_equally(load, id-1, nworkers) :
+                0;
+}
+
 template<size_t rbound, size_t start = 0, size_t step = 1>
 struct range_looping {
     size_t value{start};
@@ -91,8 +98,8 @@ struct range_itseq  : base_range<range_itseq<T, step>> {
         if (end <= start) { curr_ = nullptr; return; }
         auto load = split_equally(end-start, id, step);
         if (!load) { curr_ = nullptr; return; }
-        curr_ = start+(id*load);
-        end_ = start+(id+1)*load;
+        curr_ = start+past_load(end-start, id, step);
+        end_ = start+past_load(end-start, id, step)+load;
     }
     auto __get() const noexcept { return curr_; }
     void __next() noexcept {
@@ -254,8 +261,8 @@ struct srange_itseq  : base_range<srange_itseq<T, id, step>> {
         if (end <= start) { curr_ = nullptr; return; }
         auto load = split_equally(end-start, id, step);
         if (!load) { curr_ = nullptr; return; }
-        curr_ = start+(id*load);
-        end_ = start+(id+1)*load;
+        curr_ = start+past_load(end-start, id, step);
+        end_ = start+past_load(end-start, id, step)+load;
     }
     auto __get() const noexcept { return curr_; }
     void __next() noexcept {

@@ -1,5 +1,4 @@
 #include "invert.h"
-#include "workers.h"
 
 using namespace std;
 using namespace inv;
@@ -13,7 +12,51 @@ inline Coord Inverter::invert_abs_coord(const Coord p) const noexcept {
                  center.y + inverted_radius*sin(teta));
 }
 
+void Inverter::color_region(const Coord curr) noexcept {
+    const Coord
+            a = invert_abs_coord(Coord(curr.x-1, curr.y-1)), // ab
+            b = invert_abs_coord(Coord(curr.x, curr.y-1)),   // cp
+            c = invert_abs_coord(Coord(curr.x-1, curr.y)),
+            p = invert_abs_coord(Coord(curr.x, curr.y));
 
+    Vertex vp, va, vb, vc;
+    vp.position = p; vp.color = orig_png.getPixel(curr.x, curr.y);
+    va.position = a; va.color = orig_png.getPixel(curr.x-1, curr.y-1);
+    vb.position = b; vb.color = orig_png.getPixel(curr.x, curr.y-1);
+    vc.position = c; vc.color = orig_png.getPixel(curr.x-1, curr.y);
+
+    vertices.push_back(vb);
+    vertices.push_back(vc);
+    vertices.push_back(va);
+
+    if (quality>0) {
+        vertices.push_back(va);
+        vertices.push_back(vp);
+        vertices.push_back(vb);
+    }
+    vertices.push_back(vb);
+    vertices.push_back(vc);
+    vertices.push_back(vp);
+
+    if (quality>0) {
+        vertices.push_back(va);
+        vertices.push_back(vp);
+        vertices.push_back(vc);
+    }
+}
+
+void Inverter::invert_points() noexcept {
+    for (size_t x{1}; x < orig_png.getSize().x; ++x) {
+        for (size_t y{1}; y < orig_png.getSize().y; ++y) {
+            if ((x != center.x+1 || y != center.y+1 ||
+                 x != center.x   || y != center.y) &&
+                (x-center.x)*(x-center.x)+(y-center.y)*(y-center.y) >=
+                gtmodsq_maps_outside)  {
+                color_region(Coord(x, y));
+            }
+        }
+    }
+}
 
 void Inverter::invert() {
     const Coord center_priv = center;
@@ -40,19 +83,12 @@ void Inverter::invert() {
     vector<vector<Coord>>
             inverse(orig_png.getSize().y, vector<Coord>
                     (orig_png.getSize().x, Coord(0, 0)));
-
-    for (size_t y{0}; y < orig_png.getSize().y; ++y) {
-        for (size_t x{0}; x < orig_png.getSize().x; ++x) {
-            if (x != center.x || y != center.y ||
-                (x-center.x)*(x-center.x)+(y-center.y)*(y-center.y) >=
-                gtmodsq_maps_outside-1) {
-                inverse[y][x] = result[y*orig_png.getSize().x+x];
-            }
-        }
+    for (size_t i{0}; i < data.size(); ++i) {
+        inverse[data[i].y][data[i].x] = result[i];
     }
     Vertex vp, va, vb, vc;
-    for (size_t y{1}; y < orig_png.getSize().y-1; ++y) {
-        for (size_t x{1}; x < orig_png.getSize().x-1; ++x) {
+    for (size_t y{1}; y < orig_png.getSize().y; ++y) {
+        for (size_t x{1}; x < orig_png.getSize().x; ++x) {
             if ((x != center.x   || y != center.y    ||
                  x != center.x+1 || y != center.y+1) &&
                 (x-center.x)*(x-center.x)+(y-center.y)*(y-center.y) >=
@@ -75,7 +111,6 @@ void Inverter::invert() {
                     vertices.push_back(vp);
                     vertices.push_back(vb);
                 }
-
                 vertices.push_back(vb);
                 vertices.push_back(vc);
                 vertices.push_back(vp);
@@ -85,53 +120,6 @@ void Inverter::invert() {
                     vertices.push_back(vp);
                     vertices.push_back(vc);
                 }
-            }
-        }
-    }
-}
-
-void Inverter::color_region(const Coord curr) noexcept {
-    const Coord
-            a = invert_abs_coord(Coord(curr.x-1, curr.y-1)), // ab
-            b = invert_abs_coord(Coord(curr.x, curr.y-1)),   // cp
-            c = invert_abs_coord(Coord(curr.x-1, curr.y)),
-            p = invert_abs_coord(Coord(curr.x, curr.y));
-
-    Vertex vp, va, vb, vc;
-    vp.position = p; vp.color = orig_png.getPixel(curr.x, curr.y);
-    va.position = a; va.color = orig_png.getPixel(curr.x-1, curr.y-1);
-    vb.position = b; vb.color = orig_png.getPixel(curr.x, curr.y-1);
-    vc.position = c; vc.color = orig_png.getPixel(curr.x-1, curr.y);
-
-    vertices.push_back(vb);
-    vertices.push_back(vc);
-    vertices.push_back(va);
-
-    if (quality>0) {
-        vertices.push_back(va);
-        vertices.push_back(vp);
-        vertices.push_back(vb);
-    }
-
-    vertices.push_back(vb);
-    vertices.push_back(vc);
-    vertices.push_back(vp);
-
-    if (quality>0) {
-        vertices.push_back(va);
-        vertices.push_back(vp);
-        vertices.push_back(vc);
-    }
-}
-
-void Inverter::invert_points() noexcept {
-    for (size_t x{1}; x < orig_png.getSize().x; ++x) {
-        for (size_t y{1}; y < orig_png.getSize().y; ++y) {
-            if ((x != center.x+1 || y != center.y+1 ||
-                 x != center.x   || y != center.y) &&
-                (x-center.x)*(x-center.x)+(y-center.y)*(y-center.y) >=
-                gtmodsq_maps_outside)  {
-                color_region(Coord(x, y));
             }
         }
     }

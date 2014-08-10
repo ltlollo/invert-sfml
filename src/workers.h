@@ -31,8 +31,9 @@ std::vector<U> worker(const std::vector<T>& work_queue,
     std::vector<U> res;
     if (!worker_load) { return res; } else { res.reserve(worker_load); }
 
-    for (size_t i{0}, sched{id}; i < worker_load; ++i, sched+=nworkers) {
-        res.emplace_back(fun(work_queue[sched]));
+    size_t past_load = range::past_load(total_load, id, nworkers);
+    for (size_t i{past_load}; i < past_load+worker_load; ++i) {
+        res.emplace_back(fun(work_queue[i]));
     }
     return res;
 }
@@ -41,11 +42,14 @@ template<typename T, typename U, size_t nworkers = nthreads>
 std::vector<U> work_balancer(const std::vector<T>& data,
                              std::function<U(T)>& fun) {
     std::vector<U> res;
-    if(data.empty()) { return res; } else { res.reserve(data.size()); }
-
+    if(data.empty()) {
+        return res;
+    } else {
+        res.reserve(data.size());
+    }
     std::array<std::future<std::vector<U>>, nworkers> workers;
 
-    for(size_t i{0}; i < workers.size(); ++i) {
+    for(size_t i{0}; i < nworkers; ++i) {
         workers[i] = std::async(std::launch::async, [&data, fun, i]() {
             return worker<T, U, nworkers>(data, fun, i);
         });
@@ -134,7 +138,7 @@ std::vector<U> swork_balancer_sub_seq(const std::vector<T>& data,
 
     auto workers = csworkers_onrange_sub_seq(data, fun, indexes<nworkers>());
 
-    for (size_t i{0}; i < nthreads; ++i) {
+    for (size_t i{0}; i < nworkers; ++i) {
         auto wres = workers[i].get();
         res.insert(end(res), std::make_move_iterator(begin(wres)),
                    std::make_move_iterator(end(wres)));
@@ -152,7 +156,7 @@ std::vector<U> work_balancer_sub_seq(const std::vector<T>& data,
             .get_sub_seq();
 
     auto workers = workers_onrange(ranges, fun, indexes<nworkers>());
-    for (size_t i{0}; i < nthreads; ++i) {
+    for (size_t i{0}; i < nworkers; ++i) {
         auto wres = workers[i].get();
         res.insert(end(res), std::make_move_iterator(begin(wres)),
                    std::make_move_iterator(end(wres)));
@@ -170,7 +174,7 @@ std::vector<U> work_balancer_osub(const std::vector<T>& data,
             .get_osub();
 
     auto workers = workers_onrange(ranges, fun, indexes<nworkers>());
-    for (size_t i{0}; i < nthreads; ++i) {
+    for (size_t i{0}; i < nworkers; ++i) {
         auto wres = workers[i].get();
         res.insert(end(res), std::make_move_iterator(begin(wres)),
                    std::make_move_iterator(end(wres)));
@@ -184,7 +188,8 @@ static inline void iterate(std::vector<U>& res,
                            const size_t load,
                            std::function<U(T)> fun,
                            sched::roundrobin) noexcept {
-    for (size_t i{0}, sched{id}; i < load; ++i, sched+=nworkers) {
+    for (size_t i{0}, sched{id}; i < range::split_equally(load, id, nworkers);
+         ++i, sched+=nworkers) {
         res.emplace_back(fun(work_queue[sched]));
     }
 }
@@ -195,7 +200,12 @@ static inline void iterate(std::vector<U>& res,
                            const size_t load,
                            std::function<U(T)> fun,
                            sched::sequencial) noexcept {
-    for (size_t i{id*load}; i < (id+1)*load; ++i) {
+    size_t past_load{0};
+    for (size_t i{0}; i < id; ++i) {
+        past_load += range::split_equally(load, i, nworkers);
+    }
+    for (size_t i{past_load};
+         i < past_load+range::split_equally(load, id, nworkers); ++i) {
         res.emplace_back(fun(work_queue[i]));
     }
 }
@@ -211,7 +221,7 @@ std::vector<U> static_worker(const std::vector<T>& work_queue,
     std::vector<U> res;
     if (!worker_load) { return res; } else { res.reserve(worker_load); }
 
-    iterate<T, U, S, id, nworkers>(res, work_queue, worker_load, fun, sched);
+    iterate<T, U, S, id, nworkers>(res, work_queue, total_load, fun, sched);
 
     return res;
 }
@@ -244,7 +254,7 @@ std::vector<U> static_work_balancer(const std::vector<T>& data,
 
     auto workers = static_workers(data, fun, sched, indexes<nworkers>());
 
-    for (size_t i{0}; i < nthreads; ++i) {
+    for (size_t i{0}; i < nworkers; ++i) {
         auto wres = workers[i].get();
         res.insert(end(res), std::make_move_iterator(begin(wres)),
                    std::make_move_iterator(end(wres)));
