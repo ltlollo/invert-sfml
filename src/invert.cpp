@@ -51,8 +51,8 @@ void Inverter::invert() {
         }
     }
     Vertex vp, va, vb, vc;
-    for (size_t y{1}; y < orig_png.getSize().y; ++y) {
-        for (size_t x{1}; x < orig_png.getSize().x; ++x) {
+    for (size_t y{1}; y < orig_png.getSize().y-1; ++y) {
+        for (size_t x{1}; x < orig_png.getSize().x-1; ++x) {
             if ((x != center.x   || y != center.y    ||
                  x != center.x+1 || y != center.y+1) &&
                 (x-center.x)*(x-center.x)+(y-center.y)*(y-center.y) >=
@@ -160,6 +160,7 @@ Color Inverter::get_background() const noexcept {
 }
 
 void Inverter::show_image() {
+    window.setTitle(iname);
     window.setFramerateLimit(20);
     while (window.isOpen()) {
         while (window.pollEvent(event)) {
