@@ -1,20 +1,27 @@
 #ifndef INVERT_H
 #define INVERT_H
 
-#include <vector>
-#include <stdexcept>
 #include <cmath>
-#include <iostream>
 
 #include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>
+
+#include "utils.h"
 
 namespace inv {
 
 constexpr char title[]{"invert-sfml"};
 constexpr unsigned aliasLvl{8}, quality{100};
+constexpr bool show_time{true};
 
 using Coord = sf::Vector2f;
+
+template<typename T, typename P, typename... Args>
+constexpr void domesure(T&& msg, P&& f, Args&&... args) {
+    return mesure<show_time, T, Args...>(std::forward<T>(msg),
+                                         std::forward<P>(f),
+                                         std::forward<Args>(args)...);
+}
 
 class Inverter {
 private:
@@ -36,6 +43,7 @@ private:
     std::size_t find_max_radiussq() const noexcept;
     sf::Color get_background() const noexcept;
     void show_image();
+    void invert();
 
 public:
     Inverter(const std::string& iname, const std::string& oname,

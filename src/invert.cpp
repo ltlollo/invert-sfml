@@ -1,4 +1,5 @@
 #include "invert.h"
+#include "workers.h"
 
 using namespace std;
 using namespace inv;
@@ -10,6 +11,83 @@ inline Coord Inverter::invert_abs_coord(const Coord p) const noexcept {
     inverted_radius{rsq/sqrt(rel.x*rel.x+rel.y*rel.y)};
     return Coord(center.x + inverted_radius*cos(teta),
                  center.y + inverted_radius*sin(teta));
+}
+
+
+
+void Inverter::invert() {
+    const Coord center_priv = center;
+    const size_t rsq_priv = rsq;
+    function<Coord(const Coord)> fun =
+            [center_priv, rsq_priv](const Coord p) noexcept {
+        const Coord rel{p-center_priv};
+        const double teta{atan2(rel.y, rel.x)},
+        inverted_radius{rsq_priv/sqrt(rel.x*rel.x+rel.y*rel.y)};
+        return Coord(center_priv.x + inverted_radius*cos(teta),
+                     center_priv.y + inverted_radius*sin(teta));
+    };
+    vector<Coord> data;
+    for (size_t y{0}; y < orig_png.getSize().y; ++y) {
+        for (size_t x{0}; x < orig_png.getSize().x; ++x) {
+            if (x != center.x || y != center.y ||
+                (x-center.x)*(x-center.x)+(y-center.y)*(y-center.y) >=
+                gtmodsq_maps_outside-1) {
+                data.push_back(Coord(x, y));
+            }
+        }
+    }
+    auto result = work::static_work_balancer(data, fun);
+    vector<vector<Coord>>
+            inverse(orig_png.getSize().y, vector<Coord>
+                    (orig_png.getSize().x, Coord(0, 0)));
+
+    for (size_t y{0}; y < orig_png.getSize().y; ++y) {
+        for (size_t x{0}; x < orig_png.getSize().x; ++x) {
+            if (x != center.x || y != center.y ||
+                (x-center.x)*(x-center.x)+(y-center.y)*(y-center.y) >=
+                gtmodsq_maps_outside-1) {
+                inverse[y][x] = result[y*orig_png.getSize().x+x];
+            }
+        }
+    }
+    Vertex vp, va, vb, vc;
+    for (size_t y{1}; y < orig_png.getSize().y; ++y) {
+        for (size_t x{1}; x < orig_png.getSize().x; ++x) {
+            if ((x != center.x   || y != center.y    ||
+                 x != center.x+1 || y != center.y+1) &&
+                (x-center.x)*(x-center.x)+(y-center.y)*(y-center.y) >=
+                gtmodsq_maps_outside) {
+                vp = inverse[y][x];
+                vp.color = orig_png.getPixel(x, y);
+                va.position = inverse[y-1][x-1];
+                va.color = orig_png.getPixel(x-1, y-1);
+                vb.position = inverse[y-1][x];
+                vb.color = orig_png.getPixel(x, y-1);
+                vc.position = inverse[y][x-1];
+                vc.color = orig_png.getPixel(x-1, y);
+
+                vertices.push_back(vb);
+                vertices.push_back(vc);
+                vertices.push_back(va);
+
+                if (quality>0) {
+                    vertices.push_back(va);
+                    vertices.push_back(vp);
+                    vertices.push_back(vb);
+                }
+
+                vertices.push_back(vb);
+                vertices.push_back(vc);
+                vertices.push_back(vp);
+
+                if (quality>0) {
+                    vertices.push_back(va);
+                    vertices.push_back(vp);
+                    vertices.push_back(vc);
+                }
+            }
+        }
+    }
 }
 
 void Inverter::color_region(const Coord curr) noexcept {
@@ -49,8 +127,10 @@ void Inverter::color_region(const Coord curr) noexcept {
 void Inverter::invert_points() noexcept {
     for (size_t x{1}; x < orig_png.getSize().x; ++x) {
         for (size_t y{1}; y < orig_png.getSize().y; ++y) {
-            if ((x != center.x+1 || y != center.y+1 || x != center.x || y != center.y) &&
-                (x-center.x)*(x-center.x)+(y-center.y)*(y-center.y) >= gtmodsq_maps_outside)  {
+            if ((x != center.x+1 || y != center.y+1 ||
+                 x != center.x   || y != center.y) &&
+                (x-center.x)*(x-center.x)+(y-center.y)*(y-center.y) >=
+                gtmodsq_maps_outside)  {
                 color_region(Coord(x, y));
             }
         }
@@ -68,7 +148,8 @@ size_t Inverter::find_max_radiussq() const noexcept {
 
 Color Inverter::get_background() const noexcept {
     const size_t x  = orig_png.getSize().x/2, y = orig_png.getSize().x/2;
-    const auto ca = orig_png.getPixel(0, y),
+    const auto
+            ca = orig_png.getPixel(0, y),
             cb = orig_png.getPixel(x, 0),
             cc = orig_png.getPixel(orig_png.getSize().x-1, y),
             cd = orig_png.getPixel(x, orig_png.getSize().y-1);
@@ -132,14 +213,20 @@ void Inverter::run() {
     window.create(vmode, title);    // HACK: sfml needs this to work properly
     window.clear(get_background());
     window.setVisible(show);
-    invert_points();
-    for (size_t i{0} ; i < vertices.size()/3; ++i) {
-        window.draw(&vertices[i*3], 3, Triangles);
-    }
+    domesure("invert", [&](){
+        invert();
+    });
+    domesure("draw", [&]() {
+        for (size_t i{0} ; i < vertices.size()/3; ++i) {
+            window.draw(&vertices[i*3], 3, Triangles);
+        }
+    });
     if (show) {
         show_image();
     } else {
-        window.capture().saveToFile(oname);
+        domesure("saving", [&]() {
+            window.capture().saveToFile(oname);
+        });
     }
 }
 

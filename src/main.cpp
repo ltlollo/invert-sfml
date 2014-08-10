@@ -1,41 +1,8 @@
 #include "invert.h"
 
-#include <unistd.h>
-#include <array>
-
 using namespace std;
 using namespace inv;
 
-array<int, 3> parse_coord(const string& opt) {
-    array<int, 3> res;
-    char sepa{','};
-    auto it = begin(opt);
-    for (unsigned i = 0; i < res.size()-1; ++i) {
-        auto it_ = find(it, end(opt), sepa);
-        if (it_ == end(opt)) {
-            throw runtime_error("not enough args");
-        }
-        auto str = string(it, it_);
-        if (str.empty()) {
-            throw runtime_error("empty arg "+to_string(i));
-        }
-        res[i] = atoi(str.c_str());
-        it = it_+1;
-    }
-    if (find(it, end(opt), sepa) != end(opt)) {
-        throw runtime_error("too much args");
-    }
-    if (it == end(opt)) {
-        throw runtime_error("not enough args");
-    }
-    auto pos = res.size()-1;
-    auto str = string(it, end(opt));
-    if (str.empty()) {
-        throw runtime_error("empty arg "+to_string(pos));
-    }
-    res[pos] = atoi(str.c_str());
-    return res;
-}
 
 int main(int argc, char* argv[]) {
     const auto print_help=[&]() {

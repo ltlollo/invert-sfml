@@ -16,9 +16,10 @@ if("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
     set(LTO_FLAGS "-flto -fno-use-linker-plugin -fwhole-program")
 endif()
 
+set(OPT_FLAGS "-ffast-math -funroll-all-loops -march=native -Ofast")
 set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g")
 set(CMAKE_CXX_FLAGS_MINSIZEREL "-Os -DNDEBUG -march=native ${LTO_FLAGS}")
-set(CMAKE_CXX_FLAGS_RELEASE "-Ofast -DNDEBUG -march=native ${LTO_FLAGS}")
+set(CMAKE_CXX_FLAGS_RELEASE "-Ofast -DNDEBUG ${OPT_FLAGS} ${LTO_FLAGS}")
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g ${LTO_FLAGS}")
 
 set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--no-undefined -O2 -fPIE")
@@ -27,6 +28,7 @@ set(CMAKE_MODULE_LINKER_FLAGS "${LTO_FLAGS}")
 
 set(EXECUTALBE_NAME ${PROJECT_NAME})
 
+add_library(utils utils.cpp)
 add_library(libinv invert.cpp)
 add_executable(${EXECUTALBE_NAME} main.cpp)
 
@@ -40,5 +42,6 @@ endif()
 
 target_link_libraries(${EXECUTALBE_NAME} libinv)
 target_link_libraries(libinv ${LIB_PNG})
+target_link_libraries(libinv utils)
 
 install(TARGETS ${EXECUTALBE_NAME} DESTINATION bin)
