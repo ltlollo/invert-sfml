@@ -18,7 +18,7 @@ constexpr bool show_time{true};
 using Coord = sf::Vector2f;
 
 template<typename T, typename P, typename... Args>
-constexpr void domesure(T&& msg, P&& f, Args&&... args) {
+constexpr auto domesure(T&& msg, P&& f, Args&&... args) {
     return mesure<show_time, T, Args...>(std::forward<T>(msg),
                                          std::forward<P>(f),
                                          std::forward<Args>(args)...);

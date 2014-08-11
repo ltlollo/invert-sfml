@@ -4,12 +4,17 @@ using namespace std;
 using namespace inv;
 using namespace sf;
 
-inline Coord Inverter::invert_abs_coord(const Coord p) const noexcept {
+static inline Coord __invert_abs_coord(const Coord p, const Coord center,
+                                       const size_t rsq) noexcept {
     const Coord rel{p-center};
     const double teta{atan2(rel.y, rel.x)},
     inverted_radius{rsq/sqrt(rel.x*rel.x+rel.y*rel.y)};
     return Coord(center.x + inverted_radius*cos(teta),
                  center.y + inverted_radius*sin(teta));
+}
+
+inline Coord Inverter::invert_abs_coord(const Coord p) const noexcept {
+    return __invert_abs_coord(p, center, rsq);
 }
 
 void Inverter::color_region(const Coord curr) noexcept {
@@ -63,11 +68,7 @@ void Inverter::invert() {
     const size_t rsq_priv = rsq;
     function<Coord(const Coord)> fun =
             [center_priv, rsq_priv](const Coord p) noexcept {
-        const Coord rel{p-center_priv};
-        const double teta{atan2(rel.y, rel.x)},
-        inverted_radius{rsq_priv/sqrt(rel.x*rel.x+rel.y*rel.y)};
-        return Coord(center_priv.x + inverted_radius*cos(teta),
-                     center_priv.y + inverted_radius*sin(teta));
+        return __invert_abs_coord(p, center_priv, rsq_priv);
     };
     vector<Coord> data;
     for (size_t y{0}; y < orig_png.getSize().y; ++y) {
@@ -80,9 +81,8 @@ void Inverter::invert() {
         }
     }
     auto result = work::static_work_balancer(data, fun);
-    vector<vector<Coord>>
-            inverse(orig_png.getSize().y, vector<Coord>
-                    (orig_png.getSize().x, Coord(0, 0)));
+    vector<vector<Coord>> inverse(orig_png.getSize().y, vector<Coord>(
+                                      orig_png.getSize().x, Coord(0, 0)));
     for (size_t i{0}; i < data.size(); ++i) {
         inverse[data[i].y][data[i].x] = result[i];
     }
@@ -202,10 +202,10 @@ void Inverter::run() {
     window.create(vmode, title);    // HACK: sfml needs this to work properly
     window.clear(get_background());
     window.setVisible(show);
-    domesure("invert", [&](){
+    domesure("inverting", [&](){
         invert();
     });
-    domesure("draw", [&]() {
+    domesure("drawing", [&]() {
         for (size_t i{0} ; i < vertices.size()/3; ++i) {
             window.draw(&vertices[i*3], 3, Triangles);
         }
