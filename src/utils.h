@@ -30,6 +30,38 @@ constexpr typename std::enable_if<!enable>::type mesure(T&& msg, P&& f,
     f(std::forward<Args>(args)...);
 }
 
-std::array<int, 3> parse_coord(const std::string& opt);
+template<typename T> void getnum(const char*, T& num);
+
+template<unsigned N, typename T, char sepa = ','>
+std::array<T, N> parse_coord(const std::string& opt)
+{
+    std::array<T, N> res;
+    auto it = std::begin(opt);
+    for (unsigned i = 0; i < N-1; ++i) {
+        auto it_ = std::find(it, std::end(opt), sepa);
+        if (it_ == std::end(opt)) {
+            throw std::runtime_error("not enough args");
+        }
+        auto str = std::string(it, it_);
+        if (str.empty()) {
+            throw std::runtime_error("empty arg " + std::to_string(i));
+        }
+        getnum<T>(str.c_str(), res[i]);
+        it = it_+sizeof(sepa);
+    }
+    if (std::find(it, std::end(opt), sepa) != std::end(opt)) {
+        throw std::runtime_error("too much args");
+    }
+    if (it == std::end(opt)) {
+        throw std::runtime_error("not enough args");
+    }
+    auto pos = N-1;
+    auto str = std::string(it, std::end(opt));
+    if (str.empty()) {
+        throw std::runtime_error("empty arg " + std::to_string(pos));
+    }
+    getnum<T>(str.c_str(), res[pos]);
+    return res;
+}
 
 #endif // UTILS_H

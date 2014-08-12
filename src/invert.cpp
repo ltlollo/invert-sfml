@@ -4,7 +4,15 @@ using namespace std;
 using namespace inv;
 using namespace sf;
 
-static inline Coord __invert_abs_coord(const Coord p, const Coord center,
+static inline Coord __complex_transform(const Coord center, const Coord p,
+                                        const Cmplx a, const Cmplx b,
+                                        const Cmplx c, const Cmplx d) noexcept {
+    const Cmplx rel(p.x-center.x,p.y-center.y);
+    auto res = (a*rel+b)/(c*rel+d);
+    return Coord(center.x+res.real(),center.y+res.imag());
+}
+
+static inline Coord __invert_transform(const Coord p, const Coord center,
                                        const size_t rsq) noexcept {
     const Coord rel{p-center};
     const double teta{atan2(rel.y, rel.x)},
@@ -13,62 +21,89 @@ static inline Coord __invert_abs_coord(const Coord p, const Coord center,
                  center.y + inverted_radius*sin(teta));
 }
 
-inline Coord Inverter::invert_abs_coord(const Coord p) const noexcept {
-    return __invert_abs_coord(p, center, rsq);
+static inline Coord __another_trasformation(const Coord p, const Coord center,
+                                            const size_t rsq) noexcept {
+    const Coord rel{p-center};
+    const double teta{atan2(rel.y, rel.x)},
+    inverted_radius{rsq/sqrt(rel.x*rel.x+rel.y*rel.y)};
+    return Coord(center.x + inverted_radius*tanh(teta),
+                 center.y + inverted_radius/tan(teta));
 }
 
-void Inverter::color_region(const Coord curr) noexcept {
-    const Coord
-            a = invert_abs_coord(Coord(curr.x-1, curr.y-1)), // ab
-            b = invert_abs_coord(Coord(curr.x, curr.y-1)),   // cp
-            c = invert_abs_coord(Coord(curr.x-1, curr.y)),
-            p = invert_abs_coord(Coord(curr.x, curr.y));
+void Inverter::reset_tmap() noexcept {
+    for (auto& v: tmap) {
+        for (auto& it : v) {
+            it = Coord(0, 0);
+        }
+    }
+}
 
+string Inverter::get_title() const {
+    return iname +
+            (show_size ? " size: " + to_string(orig_png.getSize().x) + 'x' +
+                         to_string(orig_png.getSize().y):"") +
+            (show_center ? " center: " + to_string((int)center.x) + ',' +
+                           to_string((int)center.y):"");
+}
+
+void Inverter::transform() {
+    const Coord center_ = center;
+    const Cmplx a_ = a, b_ = b, c_ = c, d_ = d;
+    function<Coord(const Coord)> fun =
+            [center_, a_, b_, c_, d_](const Coord p) noexcept {
+        return __complex_transform(center_, p, a_, b_, c_, d_);
+    };
+    vector<Coord> data;
+    for (size_t y{0}; y < orig_png.getSize().y; ++y) {
+        for (size_t x{0}; x < orig_png.getSize().x; ++x) {
+            data.push_back(Coord(x, y));
+        }
+    }
+    auto result = work::static_work_balancer(data, fun);
+
+    for (size_t i{0}; i < data.size(); ++i) {
+        tmap[data[i].y][data[i].x] = result[i];
+    }
     Vertex vp, va, vb, vc;
-    vp.position = p; vp.color = orig_png.getPixel(curr.x, curr.y);
-    va.position = a; va.color = orig_png.getPixel(curr.x-1, curr.y-1);
-    vb.position = b; vb.color = orig_png.getPixel(curr.x, curr.y-1);
-    vc.position = c; vc.color = orig_png.getPixel(curr.x-1, curr.y);
+    for (size_t y{1}; y < orig_png.getSize().y; ++y) {
+        for (size_t x{1}; x < orig_png.getSize().x; ++x) {
+            vp = tmap[y][x];
+            vp.color = orig_png.getPixel(x, y);
+            va.position = tmap[y-1][x-1];
+            va.color = orig_png.getPixel(x-1, y-1);
+            vb.position = tmap[y-1][x];
+            vb.color = orig_png.getPixel(x, y-1);
+            vc.position = tmap[y][x-1];
+            vc.color = orig_png.getPixel(x-1, y);
 
-    vertices.push_back(vb);
-    vertices.push_back(vc);
-    vertices.push_back(va);
+            vertices.push_back(vb);
+            vertices.push_back(vc);
+            vertices.push_back(va);
 
-    if (quality>0) {
-        vertices.push_back(va);
-        vertices.push_back(vp);
-        vertices.push_back(vb);
-    }
-    vertices.push_back(vb);
-    vertices.push_back(vc);
-    vertices.push_back(vp);
+            if (quality>0) {
+                vertices.push_back(va);
+                vertices.push_back(vp);
+                vertices.push_back(vb);
+            }
+            vertices.push_back(vb);
+            vertices.push_back(vc);
+            vertices.push_back(vp);
 
-    if (quality>0) {
-        vertices.push_back(va);
-        vertices.push_back(vp);
-        vertices.push_back(vc);
-    }
-}
-
-void Inverter::invert_points() noexcept {
-    for (size_t x{1}; x < orig_png.getSize().x; ++x) {
-        for (size_t y{1}; y < orig_png.getSize().y; ++y) {
-            if ((x != center.x+1 || y != center.y+1 ||
-                 x != center.x   || y != center.y) &&
-                (x-center.x)*(x-center.x)+(y-center.y)*(y-center.y) >=
-                gtmodsq_maps_outside)  {
-                color_region(Coord(x, y));
+            if (quality>0) {
+                vertices.push_back(va);
+                vertices.push_back(vp);
+                vertices.push_back(vc);
             }
         }
     }
 }
 
 void Inverter::invert() {
-    const Coord center_priv = center;
-    const size_t rsq_priv = rsq;
+    const Coord center_ = center;
+    const size_t rsq_ = rsq;
     function<Coord(const Coord)> fun =
-            [center_priv, rsq_priv](const Coord p) noexcept {
-        return __invert_abs_coord(p, center_priv, rsq_priv);
+            [center_, rsq_](const Coord p) noexcept {
+        return __invert_transform(p, center_, rsq_);
     };
     vector<Coord> data;
     for (size_t y{0}; y < orig_png.getSize().y; ++y) {
@@ -81,10 +116,9 @@ void Inverter::invert() {
         }
     }
     auto result = work::static_work_balancer(data, fun);
-    vector<vector<Coord>> inverse(orig_png.getSize().y, vector<Coord>(
-                                      orig_png.getSize().x, Coord(0, 0)));
+
     for (size_t i{0}; i < data.size(); ++i) {
-        inverse[data[i].y][data[i].x] = result[i];
+        tmap[data[i].y][data[i].x] = result[i];
     }
     Vertex vp, va, vb, vc;
     for (size_t y{1}; y < orig_png.getSize().y; ++y) {
@@ -93,13 +127,13 @@ void Inverter::invert() {
                  x != center.x+1 || y != center.y+1) &&
                 (x-center.x)*(x-center.x)+(y-center.y)*(y-center.y) >=
                 gtmodsq_maps_outside) {
-                vp = inverse[y][x];
+                vp = tmap[y][x];
                 vp.color = orig_png.getPixel(x, y);
-                va.position = inverse[y-1][x-1];
+                va.position = tmap[y-1][x-1];
                 va.color = orig_png.getPixel(x-1, y-1);
-                vb.position = inverse[y-1][x];
+                vb.position = tmap[y-1][x];
                 vb.color = orig_png.getPixel(x, y-1);
-                vc.position = inverse[y][x-1];
+                vc.position = tmap[y][x-1];
                 vc.color = orig_png.getPixel(x-1, y);
 
                 vertices.push_back(vb);
@@ -148,7 +182,7 @@ Color Inverter::get_background() const noexcept {
 }
 
 void Inverter::show_image() {
-    window.setTitle(iname);
+    window.setTitle(get_title());
     window.setFramerateLimit(20);
     while (window.isOpen()) {
         while (window.pollEvent(event)) {
@@ -172,14 +206,37 @@ void Inverter::show_image() {
 Inverter::Inverter(const string& iname, const string& oname,
                    const Coord center, const int radius, const bool show)
     : iname(iname), oname(oname), radius(radius), center(center),
-      rsq(radius*radius), settings(0, 0, aliasLvl, 3, 0), show{show} {
+      rsq(radius*radius), settings(0, 0, aliasLvl, 3, 0), show{show},
+      invert_not_transform{true} {
     orig_png.loadFromFile(iname);
     gtmodsq_maps_outside = find_max_radiussq();
+    tmap = vector<vector<Coord>>(orig_png.getSize().y, vector<Coord
+                                 >(orig_png.getSize().x,Coord(0, 0)));
+}
+
+Inverter::Inverter(const string& iname, const string& oname,
+                   const Cmplx a, const Cmplx b, const Cmplx c, const Cmplx d,
+                   bool show)
+    : iname(iname), oname(oname), a{a}, b{b}, c{c}, d{d},
+      settings(0, 0, aliasLvl, 3, 0), show{show},
+      invert_not_transform{false} {
+    orig_png.loadFromFile(iname);
+    tmap = vector<vector<Coord>>(orig_png.getSize().y, vector<Coord
+                                 >(orig_png.getSize().x,Coord(0, 0)));
+    center.x = orig_png.getSize().x/2;
+    center.y = orig_png.getSize().y/2;
 }
 
 Inverter::Inverter(const string& iname, const bool show)
     :  Inverter(iname, iname+"-out.png", show)
 {}
+
+Inverter::Inverter(const string& iname,
+                   const Cmplx a, const Cmplx b, const Cmplx c, const Cmplx d,
+                   const bool show)
+    : Inverter(iname, iname+"-out.png", a, b, c, d, show)
+{}
+
 
 Inverter::Inverter(const string& iname, const Coord center,
                    const int radius, const bool show)
@@ -202,9 +259,15 @@ void Inverter::run() {
     window.create(vmode, title);    // HACK: sfml needs this to work properly
     window.clear(get_background());
     window.setVisible(show);
-    domesure("inverting", [&](){
-        invert();
-    });
+    if (invert_not_transform) {
+        domesure("inverting", [&](){
+            invert();
+        });
+    } else {
+        domesure("transforming", [&](){
+            transform();
+        });
+    }
     domesure("drawing", [&]() {
         for (size_t i{0} ; i < vertices.size()/3; ++i) {
             window.draw(&vertices[i*3], 3, Triangles);

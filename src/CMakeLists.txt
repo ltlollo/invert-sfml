@@ -29,6 +29,7 @@ set(CMAKE_MODULE_LINKER_FLAGS "${LTO_FLAGS}")
 set(EXECUTALBE_NAME ${PROJECT_NAME})
 
 add_library(utils utils.cpp)
+add_library(libinvnmp invertnmp.cpp)
 add_library(libinv invert.cpp)
 add_executable(${EXECUTALBE_NAME} main.cpp)
 

@@ -25,9 +25,11 @@ int main(int argc, char* argv[]) {
     };
     string oname, iname;
     array<int, 3> xyr;
-    bool outopt{false}, showopt{false}, inopt{false}, coordopt{false};
+    array<float, 8> t;
+    bool outopt{false}, showopt{false}, inopt{false}, coordopt{false},
+    transopt{false};
     int opt;
-    while ((opt = getopt(argc, argv, "hso:i:c:")) != -1) {
+    while ((opt = getopt(argc, argv, "hso:i:c:t:")) != -1) {
         switch (opt) {
         case 's':
             showopt = true;
@@ -41,8 +43,12 @@ int main(int argc, char* argv[]) {
             inopt = true;
             break;
         case 'c':
-            xyr = parse_coord(string(optarg));
+            xyr = parse_coord<3, int>(string(optarg));
             coordopt = true;
+            break;
+        case 't':
+            t = parse_coord<8, float>(string(optarg));
+            transopt = true;
             break;
         case 'h':
             print_help();
@@ -53,14 +59,17 @@ int main(int argc, char* argv[]) {
         }
     }
     if ((outopt && oname.empty()) || !inopt || iname.empty() ||
-        (showopt && outopt) || optind != argc ) {
+        (showopt && outopt) || (transopt &&  coordopt) || optind != argc ) {
         print_help();
         return 1;
     }
     if(!outopt) {
         oname = iname + "-out.png";
     }
-    if (coordopt) {
+    if (transopt) {
+        const Cmplx a(t[0],t[1]), b(t[2],t[3]), c(t[4],t[5]), d(t[6],t[7]);
+        Inverter(iname, oname, a, b, c, d, showopt).run();
+    } else if (coordopt) {
         const Coord inv_center(xyr[0],xyr[1]);
         Inverter(iname, oname, inv_center, xyr[2], showopt).run();
     } else {
