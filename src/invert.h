@@ -15,6 +15,7 @@ namespace inv {
 constexpr char title[]{"invert-sfml"};
 constexpr unsigned aliasLvl{8}, quality{100};
 constexpr bool show_time{true}, show_size{true}, show_center{true};
+constexpr float delta{100};
 
 using Coord = sf::Vector2f;
 using Cmplx = std::complex<float>;
@@ -49,6 +50,7 @@ private:
     void transform();
     void reset_tmap() noexcept;
     std::string get_title() const;
+    bool outside_image(const Coord p) const noexcept;
 
 public:
     Inverter(const std::string& iname, const std::string& oname,
