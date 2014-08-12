@@ -72,12 +72,10 @@ void Inverter::transform() {
     Vertex vp, va, vb, vc;
     for (size_t y{1}; y < orig_png.getSize().y; ++y) {
         for (size_t x{1}; x < orig_png.getSize().x; ++x) {
-
             if (outside_image(tmap[y][x])   || outside_image(tmap[y][x-1]) ||
                 outside_image(tmap[y-1][x]) || outside_image(tmap[y-1][x-1])) {
                 continue;
             }
-
             vp = tmap[y][x];
             vp.color = orig_png.getPixel(x, y);
             va.position = tmap[y-1][x-1];
@@ -86,7 +84,6 @@ void Inverter::transform() {
             vb.color = orig_png.getPixel(x, y-1);
             vc.position = tmap[y][x-1];
             vc.color = orig_png.getPixel(x-1, y);
-
 
             vertices.push_back(vb);
             vertices.push_back(vc);
