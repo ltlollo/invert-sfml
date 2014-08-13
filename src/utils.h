@@ -39,7 +39,7 @@ template<unsigned N, typename T, char sepa = ','>
 std::array<T, N> parse_coord(const std::string& opt) {
     static_assert(N>0, "cannot parse zero arguments");
     static_assert(sepa == ','|| sepa == ':' || sepa == ';' || sepa == '#',
-                  "unsipported separator");
+                  "unsupported separator");
     std::array<T, N> res;
     auto it = std::begin(opt);
     for (unsigned i = 0; i < N-1; ++i) {

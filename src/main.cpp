@@ -6,7 +6,7 @@ using namespace inv;
 int main(int argc, char* argv[]) {
     const auto print_help=[&]() {
         cerr << "Usage:\t" << argv[0]
-             << " -i input [-o output|-s] [-h] [-c coord]\n"
+             << " -i input [-o output|-s] [-h] [-c coord|-t trasform]\n"
                 "Scope:\tinvert the space such that the polar coordinate system"
                 " centered in (X,Y) {r, θ} becomes {r' = R^2/r, θ' = θ}\n"
                 "Flags:\t-input(string):"
@@ -19,7 +19,14 @@ int main(int argc, char* argv[]) {
                 "\t\t-Y(int, defaults height/2):"
                 " the y coordinate of the center of inversion\n"
                 "\t\t-R(int, defaults min(X,Y)/2):"
-                " the radius of the circle of inversion"
+                " the radius of the circle of inversion\n"
+                "\t-transform: Re{a},Img{a},Re{b},Img{b},Re{c},"
+                "Img{c},Re{d},Img{d}:\n"
+                "\t\t(X+i*Y) = z becomes:\n"
+                "\t\tz*(Re{a}+i*Img{a})+(Re{b}+i*Img{b})\n"
+                "\t\t―――――――――――――――――――――――――――――――――――\n"
+                "\t\tz*(Re{c}+i*Img{c})+(Re{d}+i*Img{d})\n"
+                "\t\twhere (X, Y) is a coordinate relative to the center of the image"
              << endl;
     };
     string oname, iname;
