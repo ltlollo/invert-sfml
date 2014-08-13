@@ -8,7 +8,7 @@
 
 #include "invert.h"
 
-using namespace inv;
+namespace inv {
 
 class InverterNMP {
 private:
@@ -45,5 +45,5 @@ public:
     void set_radius(const int d) noexcept;
     int get_radius() const noexcept;
 };
-
+} // namespace inv
 #endif // INVERTNMP_H

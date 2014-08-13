@@ -2,8 +2,9 @@
 #include <complex>
 
 using namespace std;
-using namespace inv;
 using namespace sf;
+
+namespace inv {
 
 static inline Coord __transform(const Coord center,
                                 const Coord p,
@@ -196,3 +197,4 @@ void InverterNMP::set_radius(const int d) noexcept {
 int InverterNMP::get_radius() const noexcept {
     return radius;
 }
+} // namespace inv

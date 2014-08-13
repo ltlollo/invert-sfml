@@ -9,6 +9,8 @@ using sf::VideoMode;
 using sf::Color;
 using sf::Triangles;
 
+namespace inv {
+
 static inline Coord __complex_transform(const Coord center, const Coord p,
                                         const Cmplx a, const Cmplx b,
                                         const Cmplx c, const Cmplx d) noexcept {
@@ -313,3 +315,4 @@ void Transform::set_radius(const int d) noexcept {
 int Transform::get_radius() const noexcept {
     return radius;
 }
+} // namespace inv

@@ -22,9 +22,9 @@ using Cmplx = std::complex<float>;
 
 template<typename T, typename P, typename... Args>
 constexpr auto domesure(T&& msg, P&& f, Args&&... args) {
-    return mesure<show_time, T, Args...>(std::forward<T>(msg),
-                                         std::forward<P>(f),
-                                         std::forward<Args>(args)...);
+    return fun::mesure<show_time, T, Args...>(std::forward<T>(msg),
+                                              std::forward<P>(f),
+                                              std::forward<Args>(args)...);
 }
 
 class Transform {
@@ -54,16 +54,16 @@ private:
 
 public:
     Transform(const std::string& iname, const std::string& oname,
-             const Coord center, const int radius, bool show=false);
+              const Coord center, const int radius, bool show=false);
     Transform(const std::string& iname, const std::string& oname,
-             const Cmplx a, const Cmplx b, const Cmplx c, const Cmplx d,
-             bool show=false);
+              const Cmplx a, const Cmplx b, const Cmplx c, const Cmplx d,
+              bool show=false);
     Transform(const std::string& iname, const Cmplx a, const Cmplx b,
-             const Cmplx c, const Cmplx d, const bool show = false);
+              const Cmplx c, const Cmplx d, const bool show = false);
     Transform(const std::string& iname, const Coord center, const int radius,
-             const bool show = false);
+              const bool show = false);
     Transform(const std::string& iname, const std::string& oname,
-             const bool show = false);
+              const bool show = false);
     explicit Transform(const std::string& iname, const bool show = false);
     void run();
     void set_center(const Coord p) noexcept;
@@ -71,6 +71,5 @@ public:
     void set_radius(const int d) noexcept;
     int get_radius() const noexcept;
 };
-
 }
 #endif // INVERT_H

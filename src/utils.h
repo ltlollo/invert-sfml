@@ -11,6 +11,8 @@
 
 #include <unistd.h>
 
+namespace fun {
+
 template<bool enable, typename T, typename P, typename... Args>
 constexpr typename std::enable_if<enable>::type mesure(T&& msg, P&& f,
                                                        Args&&... args) {
@@ -68,5 +70,5 @@ std::array<T, N> parse_coord(const std::string& opt) {
     getnum(str, res[pos]);
     return res;
 }
-
+} // namespace fun
 #endif // UTILS_H

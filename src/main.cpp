@@ -2,6 +2,7 @@
 
 using namespace std;
 using namespace inv;
+using namespace fun;
 
 int main(int argc, char* argv[]) {
     const auto print_help=[&]() {
@@ -26,7 +27,8 @@ int main(int argc, char* argv[]) {
                 "\t\tz*(Re{a}+i*Img{a})+(Re{b}+i*Img{b})\n"
                 "\t\t―――――――――――――――――――――――――――――――――――\n"
                 "\t\tz*(Re{c}+i*Img{c})+(Re{d}+i*Img{d})\n"
-                "\t\twhere (X, Y) is a coordinate relative to the center of the image"
+                "\t\twhere (X, Y) is a coordinate relative"
+                " to the center of the image"
              << endl;
     };
     string oname, iname;
