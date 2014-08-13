@@ -1,4 +1,4 @@
-- parallelize invert_coords?
 - make use of setters instead of constructors? (no invariance reqs)
 - understand why the window is not vreated with the proper video mode the first time
 - allow window interaction?
+- fix the scripts
