@@ -27,7 +27,7 @@ constexpr auto domesure(T&& msg, P&& f, Args&&... args) {
                                          std::forward<Args>(args)...);
 }
 
-class Inverter {
+class Transform {
 private:
     std::vector<std::vector<Coord>> tmap;
     const std::string iname, oname;
@@ -53,18 +53,18 @@ private:
     bool outside_image(const Coord p) const noexcept;
 
 public:
-    Inverter(const std::string& iname, const std::string& oname,
+    Transform(const std::string& iname, const std::string& oname,
              const Coord center, const int radius, bool show=false);
-    Inverter(const std::string& iname, const std::string& oname,
+    Transform(const std::string& iname, const std::string& oname,
              const Cmplx a, const Cmplx b, const Cmplx c, const Cmplx d,
              bool show=false);
-    Inverter(const std::string& iname, const Cmplx a, const Cmplx b,
+    Transform(const std::string& iname, const Cmplx a, const Cmplx b,
              const Cmplx c, const Cmplx d, const bool show = false);
-    Inverter(const std::string& iname, const Coord center, const int radius,
+    Transform(const std::string& iname, const Coord center, const int radius,
              const bool show = false);
-    Inverter(const std::string& iname, const std::string& oname,
+    Transform(const std::string& iname, const std::string& oname,
              const bool show = false);
-    explicit Inverter(const std::string& iname, const bool show = false);
+    explicit Transform(const std::string& iname, const bool show = false);
     void run();
     void set_center(const Coord p) noexcept;
     Coord get_center() const noexcept;

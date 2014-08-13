@@ -2,7 +2,12 @@
 
 using namespace std;
 using namespace inv;
-using namespace sf;
+using sf::Vertex;
+using sf::Event;
+using sf::Keyboard;
+using sf::VideoMode;
+using sf::Color;
+using sf::Triangles;
 
 static inline Coord __complex_transform(const Coord center, const Coord p,
                                         const Cmplx a, const Cmplx b,
@@ -30,7 +35,7 @@ static inline Coord __another_trasform(const Coord p, const Coord center,
                  center.y + inverted_radius/tan(teta));
 }
 
-void Inverter::reset_tmap() noexcept {
+void Transform::reset_tmap() noexcept {
     for (auto& v: tmap) {
         for (auto& it : v) {
             it = Coord(0, 0);
@@ -38,7 +43,7 @@ void Inverter::reset_tmap() noexcept {
     }
 }
 
-string Inverter::get_title() const {
+string Transform::get_title() const {
     return iname +
             (show_size ? " size: " + to_string(orig_png.getSize().x) + 'x' +
                          to_string(orig_png.getSize().y):"") +
@@ -46,12 +51,12 @@ string Inverter::get_title() const {
                            to_string((int)center.y):"");
 }
 
-bool Inverter::outside_image(const Coord p) const noexcept {
+bool Transform::outside_image(const Coord p) const noexcept {
     return p.x + delta < 0 || p.x - delta > orig_png.getSize().x ||
             p.y + delta < 0 || p.y - delta > orig_png.getSize().y;
 }
 
-void Inverter::transform() {
+void Transform::transform() {
     const Coord center_ = center;
     const Cmplx a_ = a, b_ = b, c_ = c, d_ = d;
     function<Coord(const Coord)> fun =
@@ -107,7 +112,7 @@ void Inverter::transform() {
     }
 }
 
-void Inverter::invert() {
+void Transform::invert() {
     const Coord center_ = center;
     const size_t rsq_ = rsq;
     function<Coord(const Coord)> fun =
@@ -168,7 +173,7 @@ void Inverter::invert() {
     }
 }
 
-size_t Inverter::find_max_radiussq() const noexcept {
+size_t Transform::find_max_radiussq() const noexcept {
     const size_t max_x = center.x >= (orig_png.getSize().x-1)/2 ?
                              center.x : orig_png.getSize().x-1 - center.x;
     const size_t max_y = center.y >= (orig_png.getSize().y-1)/2 ?
@@ -177,7 +182,7 @@ size_t Inverter::find_max_radiussq() const noexcept {
     return rsq*rsq/(2*(max+2)*(max+2));
 }
 
-Color Inverter::get_background() const noexcept {
+Color Transform::get_background() const noexcept {
     const size_t x  = orig_png.getSize().x/2, y = orig_png.getSize().x/2;
     const auto
             ca = orig_png.getPixel(0, y),
@@ -190,7 +195,7 @@ Color Inverter::get_background() const noexcept {
     return avg;
 }
 
-void Inverter::show_image() {
+void Transform::show_image() {
     window.setTitle(get_title());
     window.setFramerateLimit(20);
     while (window.isOpen()) {
@@ -212,7 +217,7 @@ void Inverter::show_image() {
     }
 }
 
-Inverter::Inverter(const string& iname, const string& oname,
+Transform::Transform(const string& iname, const string& oname,
                    const Coord center, const int radius, const bool show)
     : iname(iname), oname(oname), radius(radius), center(center),
       rsq(radius*radius), settings(0, 0, aliasLvl, 3, 0), show{show},
@@ -223,7 +228,7 @@ Inverter::Inverter(const string& iname, const string& oname,
                                  >(orig_png.getSize().x,Coord(0, 0)));
 }
 
-Inverter::Inverter(const string& iname, const string& oname,
+Transform::Transform(const string& iname, const string& oname,
                    const Cmplx a, const Cmplx b, const Cmplx c, const Cmplx d,
                    bool show)
     : iname(iname), oname(oname), a{a}, b{b}, c{c}, d{d},
@@ -236,25 +241,25 @@ Inverter::Inverter(const string& iname, const string& oname,
     center.y = orig_png.getSize().y/2;
 }
 
-Inverter::Inverter(const string& iname, const bool show)
-    :  Inverter(iname, iname+"-out.png", show)
+Transform::Transform(const string& iname, const bool show)
+    :  Transform(iname, iname+"-out.png", show)
 {}
 
-Inverter::Inverter(const string& iname,
+Transform::Transform(const string& iname,
                    const Cmplx a, const Cmplx b, const Cmplx c, const Cmplx d,
                    const bool show)
-    : Inverter(iname, iname+"-out.png", a, b, c, d, show)
+    : Transform(iname, iname+"-out.png", a, b, c, d, show)
 {}
 
 
-Inverter::Inverter(const string& iname, const Coord center,
+Transform::Transform(const string& iname, const Coord center,
                    const int radius, const bool show)
-    : Inverter(iname, iname+"-out.png", center, radius, show)
+    : Transform(iname, iname+"-out.png", center, radius, show)
 {}
 
-Inverter::Inverter(const string& iname, const string& oname,
+Transform::Transform(const string& iname, const string& oname,
                    const bool show)
-    : Inverter(iname, oname, Coord(0,0), 0, show) {
+    : Transform(iname, oname, Coord(0,0), 0, show) {
     center.x = orig_png.getSize().x/2;
     center.y = orig_png.getSize().y/2;
     radius = (center.x > center.y ? center.y/2 : center.x/2);
@@ -262,7 +267,7 @@ Inverter::Inverter(const string& iname, const string& oname,
     gtmodsq_maps_outside = find_max_radiussq();
 }
 
-void Inverter::run() {
+void Transform::run() {
     VideoMode vmode(orig_png.getSize().x, orig_png.getSize().y);
     window.create(vmode, title);
     window.create(vmode, title);    // HACK: sfml needs this to work properly
@@ -291,20 +296,20 @@ void Inverter::run() {
     }
 }
 
-void Inverter::set_center(const Coord p) noexcept {
+void Transform::set_center(const Coord p) noexcept {
     center = p;
     gtmodsq_maps_outside = find_max_radiussq();
 }
 
-Coord Inverter::get_center() const noexcept {
+Coord Transform::get_center() const noexcept {
     return center;
 }
 
-void Inverter::set_radius(const int d) noexcept {
+void Transform::set_radius(const int d) noexcept {
     radius = d;
     rsq = d*d;
 }
 
-int Inverter::get_radius() const noexcept {
+int Transform::get_radius() const noexcept {
     return radius;
 }

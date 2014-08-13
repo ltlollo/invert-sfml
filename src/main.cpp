@@ -3,7 +3,6 @@
 using namespace std;
 using namespace inv;
 
-
 int main(int argc, char* argv[]) {
     const auto print_help=[&]() {
         cerr << "Usage:\t" << argv[0]
@@ -68,12 +67,12 @@ int main(int argc, char* argv[]) {
     }
     if (transopt) {
         const Cmplx a(t[0],t[1]), b(t[2],t[3]), c(t[4],t[5]), d(t[6],t[7]);
-        Inverter(iname, oname, a, b, c, d, showopt).run();
+        Transform(iname, oname, a, b, c, d, showopt).run();
     } else if (coordopt) {
         const Coord inv_center(xyr[0],xyr[1]);
-        Inverter(iname, oname, inv_center, xyr[2], showopt).run();
+        Transform(iname, oname, inv_center, xyr[2], showopt).run();
     } else {
-        Inverter(iname, oname, showopt).run();
+        Transform(iname, oname, showopt).run();
     }
     return 0;
 }

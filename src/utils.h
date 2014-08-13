@@ -31,10 +31,13 @@ constexpr typename std::enable_if<!enable>::type mesure(T&& msg, P&& f,
 }
 
 template<typename T> void getnum(const char*, T& num);
+template<typename T> void getnum(const std::string& str, T& num) {
+    return getnum(str.c_str(), num);
+}
 
 template<unsigned N, typename T, char sepa = ','>
-std::array<T, N> parse_coord(const std::string& opt)
-{
+std::array<T, N> parse_coord(const std::string& opt) {
+    static_assert(N>0, "Cannot parse zero arguments");
     std::array<T, N> res;
     auto it = std::begin(opt);
     for (unsigned i = 0; i < N-1; ++i) {
@@ -46,7 +49,7 @@ std::array<T, N> parse_coord(const std::string& opt)
         if (str.empty()) {
             throw std::runtime_error("empty arg " + std::to_string(i));
         }
-        getnum<T>(str.c_str(), res[i]);
+        getnum(str, res[i]);
         it = it_+sizeof(sepa);
     }
     if (std::find(it, std::end(opt), sepa) != std::end(opt)) {
@@ -60,7 +63,7 @@ std::array<T, N> parse_coord(const std::string& opt)
     if (str.empty()) {
         throw std::runtime_error("empty arg " + std::to_string(pos));
     }
-    getnum<T>(str.c_str(), res[pos]);
+    getnum(str, res[pos]);
     return res;
 }
 
