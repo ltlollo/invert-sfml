@@ -1,7 +1,6 @@
 #include "invert.h"
 
 using namespace std;
-using namespace inv;
 using sf::Vertex;
 using sf::Event;
 using sf::Keyboard;
