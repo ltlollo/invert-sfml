@@ -21,10 +21,8 @@ constexpr typename std::enable_if<enable>::type mesure(T&& msg, P&& f,
     f(std::forward<Args>(args)...);
     end = std::chrono::high_resolution_clock::now();
     std::cerr << msg << " took: "
-              << std::chrono::duration_cast<
-                 std::chrono::milliseconds
-                 >(end - start).count()
-              << "ms\n";
+              << std::chrono::duration_cast<std::chrono::milliseconds>
+                 (end - start).count() << "ms\n";
 }
 template<bool enable, typename T, typename P, typename... Args>
 constexpr typename std::enable_if<!enable>::type mesure(T&& msg, P&& f,
@@ -70,5 +68,11 @@ std::array<T, N> parse_coord(const std::string& opt) {
     getnum(str, res[pos]);
     return res;
 }
+
+template<typename T>
+std::enable_if_t<std::is_signed<T>::value, std::make_unsigned_t<T>> absolute(const T x) {
+    return x > 0 ? x : -x;
+}
+
 } // namespace fun
 #endif // UTILS_H

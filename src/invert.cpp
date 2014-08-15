@@ -53,8 +53,8 @@ string Transform::get_title() const {
 }
 
 bool Transform::outside_image(const Coord p) const noexcept {
-    return p.x + delta < 0 || p.x - delta > orig_png.getSize().x ||
-            p.y + delta < 0 || p.y - delta > orig_png.getSize().y;
+    return p.x < 0 || p.x > orig_png.getSize().x ||
+            p.y < 0 || p.y > orig_png.getSize().y;
 }
 
 void Transform::transform() {
@@ -78,8 +78,8 @@ void Transform::transform() {
     Vertex vp, va, vb, vc;
     for (size_t y{1}; y < orig_png.getSize().y; ++y) {
         for (size_t x{1}; x < orig_png.getSize().x; ++x) {
-            if (outside_image(tmap[y][x])   || outside_image(tmap[y][x-1]) ||
-                outside_image(tmap[y-1][x]) || outside_image(tmap[y-1][x-1])) {
+            if (outside_image(tmap[y][x])   && outside_image(tmap[y][x-1]) &&
+                outside_image(tmap[y-1][x]) && outside_image(tmap[y-1][x-1])) {
                 continue;
             }
             vp = tmap[y][x];
@@ -268,7 +268,7 @@ Transform::Transform(const string& iname, const string& oname,
     gtmodsq_maps_outside = find_max_radiussq();
 }
 
-void Transform::run() {
+void Transform::run() && {
     VideoMode vmode(orig_png.getSize().x, orig_png.getSize().y);
     window.create(vmode, title);
     window.create(vmode, title);    // HACK: sfml needs this to work properly

@@ -79,7 +79,8 @@ int main(int argc, char* argv[]) {
         Transform(iname, oname, a, b, c, d, showopt).run();
     } else if (coordopt) {
         const Coord inv_center(xyr[0],xyr[1]);
-        Transform(iname, oname, inv_center, xyr[2], showopt).run();
+        const unsigned radius{absolute(xyr[2])};
+        Transform(iname, oname, inv_center, radius, showopt).run();
     } else {
         Transform(iname, oname, showopt).run();
     }

@@ -15,7 +15,6 @@ namespace inv {
 constexpr char title[]{"invert-sfml"};
 constexpr unsigned aliasLvl{8}, quality{100};
 constexpr bool show_time{true}, show_size{true}, show_center{true};
-constexpr float delta{100};
 
 using Coord = sf::Vector2f;
 using Cmplx = std::complex<float>;
@@ -65,7 +64,7 @@ public:
     Transform(const std::string& iname, const std::string& oname,
               const bool show = false);
     explicit Transform(const std::string& iname, const bool show = false);
-    void run();
+    void run() &&;
     void set_center(const Coord p) noexcept;
     Coord get_center() const noexcept;
     void set_radius(const int d) noexcept;
