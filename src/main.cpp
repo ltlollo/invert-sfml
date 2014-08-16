@@ -7,8 +7,8 @@ using namespace tr;
 using namespace sf;
 
 int main(int argc, char* argv[]) {
-    const auto print_help=[&]() {
-        cerr << help << endl;
+    const auto print_help=[]() {
+        printf("%s\n", help);
     };
     string oname, iname;
     array<int, 3> xyr;
@@ -46,7 +46,7 @@ int main(int argc, char* argv[]) {
         }
     }
     if ((outopt && oname.empty()) || !inopt || iname.empty() ||
-        (showopt && outopt) || (transopt &&  coordopt) || optind != argc ) {
+        (showopt && outopt) || (transopt && coordopt) || optind != argc ) {
         print_help();
         return 1;
     }

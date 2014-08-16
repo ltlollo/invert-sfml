@@ -57,8 +57,8 @@ class Transformation {
     std::vector<Coord> tmap;
 
 public:
-    Transformation(const sf::Image& png);
-    Transformation(sf::Image&& png);
+    template<typename T>
+    Transformation(T&& png);
     Transformation(sf::Image&& png, std::vector<Coord>&& tmap);
     Transformation& transform(const TransParams& tp, Coord center);
     Transformation& invert(InvParams tp, Coord center);
@@ -68,5 +68,15 @@ public:
     Drawable draw(const unsigned winx, const unsigned winy) const;
     Drawable draw() const;
 };
+
+template<typename T>
+Transformation::Transformation(T&& png) : png{std::forward<T>(png)} {
+    auto size = png.getSize();
+    for (size_t y{0}; y < size.y; ++y) {
+        for (size_t x{0}; x < size.x; ++x) {
+            tmap.push_back(Coord(x, y));
+        }
+    }
+}
 }
 #endif // TRANSFORM_H
