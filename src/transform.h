@@ -6,9 +6,9 @@
 
 #include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>
+#include <work/workers.h>
 
 #include "utils.h"
-#include "workers.h"
 
 namespace tr {
 

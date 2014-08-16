@@ -118,7 +118,7 @@ Transformation& Transformation::transform(const TransParams& tp, Coord center) {
             [center_, a_, b_, c_, d_](const Coord p) noexcept {
         return __complex_transform(center_, p, a_, b_, c_, d_);
     };
-    auto result = work::static_work_balancer(tmap, fun);
+    auto result = work::static_work_balancer(tmap, fun, work::Num<3>());
     std::swap(tmap, result);
     return *this;
 }
