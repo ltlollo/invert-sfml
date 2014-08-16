@@ -53,7 +53,7 @@ struct InvParams {
 };
 
 class Transformation {
-    sf::Image png;
+    const sf::Image png;
     std::vector<Coord> tmap;
 
 public:

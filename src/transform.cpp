@@ -78,7 +78,7 @@ void Drawable::show() const {
     show("");
 }
 
-void Drawable::save(const std::string& fname) const &&{
+void Drawable::save(const std::string& fname) const && {
     sf::RenderWindow window;
     window.create(vmode, "");
     window.create(vmode, "");    // HACK
