@@ -1,7 +1,5 @@
 #include "utils.h"
 
-using namespace std;
-
 namespace fun {
 
 template<> void getnum<int>(const char* str, int& num) {
