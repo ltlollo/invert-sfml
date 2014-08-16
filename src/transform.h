@@ -3,7 +3,6 @@
 
 #include <cmath>
 #include <complex>
-#include <memory>
 
 #include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>
@@ -19,7 +18,6 @@ constexpr bool show_time{true}, show_size{true}, show_center{true};
 
 using Coord = sf::Vector2f;
 using Cmplx = std::complex<float>;
-
 
 inline Coord __complex_transform(const Coord center, const Coord p,
                                  const Cmplx a, const Cmplx b,
