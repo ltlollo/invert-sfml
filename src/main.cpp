@@ -71,7 +71,6 @@ int main(int argc, char* argv[]) {
         print_help();
         return 1;
     }
-
     sf::Image image;
     image.loadFromFile(iname);
 

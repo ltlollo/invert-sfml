@@ -32,8 +32,11 @@ constexpr auto domesure(T&& msg, P&& f, Args&&... args) {
 
 class Drawable {
     std::vector<sf::Vertex> vertices;
-    const unsigned x, y;
+    sf::VideoMode vmode;
     const sf::Color BG{sf::Color::Black};
+
+    void paint(sf::RenderWindow& window) const;
+
 public:
     template<typename T>
     Drawable(T&& vertices, const unsigned x, const unsigned y);

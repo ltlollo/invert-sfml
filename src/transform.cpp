@@ -28,27 +28,33 @@ static inline Coord __another_trasform(const Coord p, const Coord center,
                  center.y + inverted_radius/tan(teta));
 }
 
+
+void Drawable::paint(sf::RenderWindow& window) const {
+    domesure("painting", [&]() {
+        for (size_t i{0} ; i < vertices.size()/3; ++i) {
+            window.draw(&vertices[i*3], 3, sf::Triangles);
+        }
+    });
+}
+
 template<typename T>
 Drawable::Drawable(T&& vertices, const unsigned x, const unsigned y)
-    : vertices{std::forward<T>(vertices)}, x{x}, y{y} {
+    : vertices{std::forward<T>(vertices)}, vmode(x, y) {
 }
 
 template<typename T>
 Drawable::Drawable(T&& vertices, const unsigned x, const unsigned y,
                    const sf::Color BG)
-    : vertices{std::forward<T>(vertices)}, x{x}, y{y}, BG{BG} {
+    : vertices{std::forward<T>(vertices)}, vmode(x, y), BG{BG} {
 }
 
 void Drawable::show() const {
-    sf::RenderWindow window;
     sf::Event event;
-    sf::VideoMode vmode(x, y);
+    sf::RenderWindow window;
     window.create(vmode, title);
     window.create(vmode, title);    // HACK
     window.clear(BG);
-    for (size_t i{0} ; i < vertices.size()/3; ++i) {
-        window.draw(&vertices[i*3], 3, sf::Triangles);
-    }
+    paint(window);
     window.setFramerateLimit(20);
     while (window.isOpen()) {
         while (window.pollEvent(event)) {
@@ -71,13 +77,10 @@ void Drawable::show() const {
 
 void Drawable::save(const std::string& fname) const {
     sf::RenderWindow window;
-    sf::VideoMode vmode(x, y);
     window.create(vmode, title);
     window.create(vmode, title);    // HACK
     window.clear(BG);
-    for (size_t i{0} ; i < vertices.size()/3; ++i) {
-        window.draw(&vertices[i*3], 3, sf::Triangles);
-    }
+    paint(window);
     window.capture().saveToFile(fname);
 }
 
@@ -171,45 +174,47 @@ noexcept {
 
 Drawable Transformation::draw(const unsigned winx, const unsigned winy) const {
     std::vector<sf::Vertex> vertices;
-    for (size_t y{1}; y < png.getSize().y; ++y) {
-        for (size_t x{1}; x < png.getSize().x; ++x) {
-            auto a = tmap[x-1+(y-1)*png.getSize().x];
-            auto b = tmap[x+(y-1)*png.getSize().x];
-            auto c = tmap[x-1+y*png.getSize().x];
-            auto d = tmap[x+y*png.getSize().x];
-            sf::Vertex va(a, png.getPixel(x-1, y-1)),
-                    vb(b, png.getPixel(x, y-1)),
-                    vc(c, png.getPixel(x-1, y)),
-                    vd(d, png.getPixel(x, y));
+    domesure("transforming", [&]() {
+        for (size_t y{1}; y < png.getSize().y; ++y) {
+            for (size_t x{1}; x < png.getSize().x; ++x) {
+                auto a = tmap[x-1+(y-1)*png.getSize().x];
+                auto b = tmap[x+(y-1)*png.getSize().x];
+                auto c = tmap[x-1+y*png.getSize().x];
+                auto d = tmap[x+y*png.getSize().x];
+                sf::Vertex va(a, png.getPixel(x-1, y-1)),
+                        vb(b, png.getPixel(x, y-1)),
+                        vc(c, png.getPixel(x-1, y)),
+                        vd(d, png.getPixel(x, y));
 
-            if (inside(b, winx, winy) || inside(c, winx, winy) ||
-                inside(a, winx, winy)) {
-                vertices.push_back(vb);
-                vertices.push_back(vc);
-                vertices.push_back(va);
-            }
-            if (quality>0 &&
-                (inside(a, winx, winy) || inside(d, winx, winy) ||
-                 inside(b, winx, winy))) {
-                vertices.push_back(va);
-                vertices.push_back(vd);
-                vertices.push_back(vb);
-            }
-            if (inside(b, winx, winy) || inside(c, winx, winy) ||
-                inside(d, winx, winy)) {
-                vertices.push_back(vb);
-                vertices.push_back(vc);
-                vertices.push_back(vd);
-            }
-            if (quality>0 &&
-                (inside(a, winx, winy) || inside(d, winx, winy) ||
-                 inside(c, winx, winy))) {
-                vertices.push_back(va);
-                vertices.push_back(vd);
-                vertices.push_back(vc);
+                if (inside(b, winx, winy) || inside(c, winx, winy) ||
+                    inside(a, winx, winy)) {
+                    vertices.push_back(vb);
+                    vertices.push_back(vc);
+                    vertices.push_back(va);
+                }
+                if (quality>0 &&
+                    (inside(a, winx, winy) || inside(d, winx, winy) ||
+                     inside(b, winx, winy))) {
+                    vertices.push_back(va);
+                    vertices.push_back(vd);
+                    vertices.push_back(vb);
+                }
+                if (inside(b, winx, winy) || inside(c, winx, winy) ||
+                    inside(d, winx, winy)) {
+                    vertices.push_back(vb);
+                    vertices.push_back(vc);
+                    vertices.push_back(vd);
+                }
+                if (quality>0 &&
+                    (inside(a, winx, winy) || inside(d, winx, winy) ||
+                     inside(c, winx, winy))) {
+                    vertices.push_back(va);
+                    vertices.push_back(vd);
+                    vertices.push_back(vc);
+                }
             }
         }
-    }
+    });
     return Drawable{std::move(vertices), winx, winy, getBG(png)};
 }
 
