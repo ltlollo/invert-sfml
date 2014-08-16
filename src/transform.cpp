@@ -28,7 +28,6 @@ static inline Coord __another_trasform(const Coord p, const Coord center,
                  center.y + inverted_radius/tan(teta));
 }
 
-
 void Drawable::paint(sf::RenderWindow& window) const {
     domesure("painting", [&]() {
         for (size_t i{0} ; i < vertices.size()/3; ++i) {
@@ -48,7 +47,7 @@ Drawable::Drawable(T&& vertices, const unsigned x, const unsigned y,
     : vertices{std::forward<T>(vertices)}, vmode(x, y), BG{BG} {
 }
 
-void Drawable::show() const {
+void Drawable::show() const &&{
     sf::Event event;
     sf::RenderWindow window;
     window.create(vmode, title);
@@ -75,7 +74,7 @@ void Drawable::show() const {
     }
 }
 
-void Drawable::save(const std::string& fname) const {
+void Drawable::save(const std::string& fname) const &&{
     sf::RenderWindow window;
     window.create(vmode, title);
     window.create(vmode, title);    // HACK
