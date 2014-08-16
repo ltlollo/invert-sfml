@@ -10,9 +10,9 @@ using sf::Triangles;
 
 namespace inv {
 
-static inline Coord __complex_transform(const Coord center, const Coord p,
-                                        const Cmplx a, const Cmplx b,
-                                        const Cmplx c, const Cmplx d) noexcept {
+inline Coord __complex_transform(const Coord center, const Coord p,
+                                 const Cmplx a, const Cmplx b,
+                                 const Cmplx c, const Cmplx d) noexcept {
     const Cmplx rel(p.x-center.x,p.y-center.y);
     auto res = (a*rel+b)/(c*rel+d);
     return Coord(center.x+res.real(),center.y+res.imag());
@@ -28,7 +28,7 @@ static inline Coord __invert_transform(const Coord p, const Coord center,
 }
 
 static inline Coord __another_trasform(const Coord p, const Coord center,
-                                        const size_t rsq) noexcept {
+                                       const size_t rsq) noexcept {
     const Coord rel{p-center};
     const double teta{atan2(rel.y, rel.x)},
     inverted_radius{rsq/sqrt(rel.x*rel.x+rel.y*rel.y)};
@@ -219,7 +219,7 @@ void Transform::show_image() {
 }
 
 Transform::Transform(const string& iname, const string& oname,
-                   const Coord center, const int radius, const bool show)
+                     const Coord center, const int radius, const bool show)
     : iname(iname), oname(oname), radius(radius), center(center),
       rsq(radius*radius), settings(0, 0, aliasLvl, 3, 0), show{show},
       invert_not_transform{true} {
@@ -230,8 +230,8 @@ Transform::Transform(const string& iname, const string& oname,
 }
 
 Transform::Transform(const string& iname, const string& oname,
-                   const Cmplx a, const Cmplx b, const Cmplx c, const Cmplx d,
-                   bool show)
+                     const Cmplx a, const Cmplx b, const Cmplx c, const Cmplx d,
+                     bool show)
     : iname(iname), oname(oname), a{a}, b{b}, c{c}, d{d},
       settings(0, 0, aliasLvl, 3, 0), show{show},
       invert_not_transform{false} {
@@ -247,19 +247,19 @@ Transform::Transform(const string& iname, const bool show)
 {}
 
 Transform::Transform(const string& iname,
-                   const Cmplx a, const Cmplx b, const Cmplx c, const Cmplx d,
-                   const bool show)
+                     const Cmplx a, const Cmplx b, const Cmplx c, const Cmplx d,
+                     const bool show)
     : Transform(iname, iname+"-out.png", a, b, c, d, show)
 {}
 
 
 Transform::Transform(const string& iname, const Coord center,
-                   const int radius, const bool show)
+                     const int radius, const bool show)
     : Transform(iname, iname+"-out.png", center, radius, show)
 {}
 
 Transform::Transform(const string& iname, const string& oname,
-                   const bool show)
+                     const bool show)
     : Transform(iname, oname, Coord(0,0), 0, show) {
     center.x = orig_png.getSize().x/2;
     center.y = orig_png.getSize().y/2;
@@ -314,4 +314,5 @@ void Transform::set_radius(const int d) noexcept {
 int Transform::get_radius() const noexcept {
     return radius;
 }
+
 } // namespace inv

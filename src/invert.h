@@ -19,6 +19,11 @@ constexpr bool show_time{true}, show_size{true}, show_center{true};
 using Coord = sf::Vector2f;
 using Cmplx = std::complex<float>;
 
+
+inline Coord __complex_transform(const Coord center, const Coord p,
+                                 const Cmplx a, const Cmplx b,
+                                 const Cmplx c, const Cmplx d) noexcept;
+
 template<typename T, typename P, typename... Args>
 constexpr auto domesure(T&& msg, P&& f, Args&&... args) {
     return fun::mesure<show_time, T, Args...>(std::forward<T>(msg),

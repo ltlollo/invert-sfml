@@ -70,7 +70,8 @@ std::array<T, N> parse_coord(const std::string& opt) {
 }
 
 template<typename T>
-std::enable_if_t<std::is_signed<T>::value, std::make_unsigned_t<T>> absolute(const T x) {
+std::enable_if_t<std::is_signed<T>::value, std::make_unsigned_t<T>
+> absolute(const T x) {
     return x > 0 ? x : -x;
 }
 

@@ -1,8 +1,8 @@
-#include "invert.h"
+#include "transform.h"
 
 using namespace std;
-using namespace inv;
 using namespace fun;
+using namespace tr;
 
 int main(int argc, char* argv[]) {
     const auto print_help=[&]() {
@@ -71,18 +71,28 @@ int main(int argc, char* argv[]) {
         print_help();
         return 1;
     }
+
+    sf::Image image;
+    image.loadFromFile(iname);
+
     if(!outopt) {
         oname = iname + "-out.png";
     }
+    Transformation tr(std::move(image));
     if (transopt) {
-        const Cmplx a(t[0],t[1]), b(t[2],t[3]), c(t[4],t[5]), d(t[6],t[7]);
-        Transform(iname, oname, a, b, c, d, showopt).run();
+        const TransParams tp{{t[0],t[1]}, {t[2],t[3]}, {t[4],t[5]}, {t[6],t[7]}};
+        tr.transform(tp);
     } else if (coordopt) {
-        const Coord inv_center(xyr[0],xyr[1]);
+        const Coord center(xyr[0],xyr[1]);
         const unsigned radius{absolute(xyr[2])};
-        Transform(iname, oname, inv_center, radius, showopt).run();
+        tr.invert({radius}, center);
     } else {
-        Transform(iname, oname, showopt).run();
+        tr.invert();
+    }
+    if (showopt) {
+        tr.draw().show();
+    } else {
+        tr.draw().save(oname);
     }
     return 0;
 }
