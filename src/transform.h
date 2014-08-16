@@ -12,7 +12,6 @@
 
 namespace tr {
 
-constexpr char title[]{"invert-sfml"};
 constexpr unsigned aliasLvl{8};
 constexpr bool show_time{true}, show_size{true}, show_center{true},
 quality{true};
@@ -40,7 +39,8 @@ public:
     template<typename T>
     Drawable(T&& vertices, const unsigned x, const unsigned y,
              const sf::Color BG);
-    void show() const &&;
+    void show() const;
+    void show(const std::string title) const;
     void save(const std::string& fname) const &&;
 };
 

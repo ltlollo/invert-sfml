@@ -28,6 +28,10 @@ set(CMAKE_MODULE_LINKER_FLAGS "${LTO_FLAGS}")
 
 set(EXECUTALBE_NAME ${PROJECT_NAME})
 
+configure_file("${PROJECT_SOURCE_DIR}/config.h.in"
+               "${PROJECT_BINARY_DIR}/conf.h")
+include_directories("${PROJECT_BINARY_DIR}")
+
 add_library(utils utils.cpp)
 add_library(libtr transform.cpp)
 add_executable(${EXECUTALBE_NAME} main.cpp)

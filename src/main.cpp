@@ -1,4 +1,5 @@
 #include "transform.h"
+#include "conf.h"
 
 using namespace std;
 using namespace fun;
@@ -6,30 +7,7 @@ using namespace tr;
 
 int main(int argc, char* argv[]) {
     const auto print_help=[&]() {
-        cerr << "Usage:\t" << argv[0]
-             << " -i input [-o output|-s] [-h] [-c coord|-t trasform]\n"
-                "Scope:\tinvert the space such that the polar coordinate system"
-                " centered in (X,Y) {r, θ} becomes {r' = R^2/r, θ' = θ}\n"
-                "Flags:\t-input(string):"
-                " the image file to invert (:png)\n"
-                "\t-output(string, defaults to \"out-\"input):"
-                " the output file (:overwrites if exists)\n"
-                "\t-coord: X,Y,R:\n"
-                "\t\t-X(int, defaults width/2):"
-                " the x coordinate of the center of inversion\n"
-                "\t\t-Y(int, defaults height/2):"
-                " the y coordinate of the center of inversion\n"
-                "\t\t-R(int, defaults min(X,Y)/2):"
-                " the radius of the circle of inversion\n"
-                "\t-transform: Re{a},Img{a},Re{b},Img{b},Re{c},"
-                "Img{c},Re{d},Img{d}:\n"
-                "\t\t(X+i*Y) = z becomes:\n"
-                "\t\tz*(Re{a}+i*Img{a})+(Re{b}+i*Img{b})\n"
-                "\t\t―――――――――――――――――――――――――――――――――――\n"
-                "\t\tz*(Re{c}+i*Img{c})+(Re{d}+i*Img{d})\n"
-                "\t\twhere (X, Y) is a coordinate relative"
-                " to the center of the image"
-             << endl;
+        cerr << help << endl;
     };
     string oname, iname;
     array<int, 3> xyr;
@@ -89,7 +67,7 @@ int main(int argc, char* argv[]) {
         tr.invert();
     }
     if (showopt) {
-        tr.draw().show();
+        tr.draw().show(appname);
     } else {
         tr.draw().save(oname);
     }

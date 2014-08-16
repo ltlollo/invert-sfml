@@ -47,7 +47,7 @@ Drawable::Drawable(T&& vertices, const unsigned x, const unsigned y,
     : vertices{std::forward<T>(vertices)}, vmode(x, y), BG{BG} {
 }
 
-void Drawable::show() const &&{
+void Drawable::show(const std::string title) const {
     sf::Event event;
     sf::RenderWindow window;
     window.create(vmode, title);
@@ -74,10 +74,14 @@ void Drawable::show() const &&{
     }
 }
 
+void Drawable::show() const {
+    show("");
+}
+
 void Drawable::save(const std::string& fname) const &&{
     sf::RenderWindow window;
-    window.create(vmode, title);
-    window.create(vmode, title);    // HACK
+    window.create(vmode, "");
+    window.create(vmode, "");    // HACK
     window.clear(BG);
     paint(window);
     domesure("saving", [&]() {
