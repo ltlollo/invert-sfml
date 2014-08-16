@@ -3,8 +3,8 @@
 namespace tr {
 
 static inline Coord __complex_transform(const Coord center, const Coord p,
-                                 const Cmplx a, const Cmplx b,
-                                 const Cmplx c, const Cmplx d) noexcept {
+                                        const Cmplx a, const Cmplx b,
+                                        const Cmplx c, const Cmplx d) noexcept {
     const Cmplx rel(p.x-center.x,p.y-center.y);
     auto res = (a*rel+b)/(c*rel+d);
     return Coord(center.x+res.real(),center.y+res.imag());
@@ -80,7 +80,9 @@ void Drawable::save(const std::string& fname) const &&{
     window.create(vmode, title);    // HACK
     window.clear(BG);
     paint(window);
-    window.capture().saveToFile(fname);
+    domesure("saving", [&]() {
+        window.capture().saveToFile(fname);
+    });
 }
 
 Transformation::Transformation(const sf::Image& png) : png{png} {
