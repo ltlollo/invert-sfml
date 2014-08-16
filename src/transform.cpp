@@ -110,7 +110,7 @@ Transformation& Transformation::invert(InvParams tp, Coord center) {
             [center, rsq](const Coord p) noexcept {
         return invert_transform(p, center, rsq);
     };
-    auto result = work::static_work_balancer(tmap, fun);
+    auto result = work::static_work_balancer(tmap, fun, work::Num<3>());
     std::swap(tmap, result);
     return *this;
 }
