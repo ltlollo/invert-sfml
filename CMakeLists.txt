@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8)
 
-project(invert-sfml)
+project(transform-img)
 
 include(Compiler.cmake)
 
