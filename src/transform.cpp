@@ -2,16 +2,16 @@
 
 namespace tr {
 
-static inline Coord __complex_transform(const Coord center, const Coord p,
-                                        const Cmplx a, const Cmplx b,
-                                        const Cmplx c, const Cmplx d) noexcept {
+static inline Coord complex_transform(const Coord center, const Coord p,
+                                      const Cmplx a, const Cmplx b,
+                                      const Cmplx c, const Cmplx d) noexcept {
     const Cmplx rel(p.x-center.x,p.y-center.y);
     auto res = (a*rel+b)/(c*rel+d);
     return Coord(center.x+res.real(),center.y+res.imag());
 }
 
-static inline Coord __invert_transform(const Coord p, const Coord center,
-                                       const size_t rsq) noexcept {
+static inline Coord invert_transform(const Coord p, const Coord center,
+                                     const size_t rsq) noexcept {
     const Coord rel{p-center};
     const double teta{atan2(rel.y, rel.x)},
     inverted_radius{rsq/sqrt(rel.x*rel.x+rel.y*rel.y)};
@@ -19,8 +19,8 @@ static inline Coord __invert_transform(const Coord p, const Coord center,
                  center.y + inverted_radius*sin(teta));
 }
 
-static inline Coord __another_trasform(const Coord p, const Coord center,
-                                       const size_t rsq) noexcept {
+static inline Coord another_trasform(const Coord p, const Coord center,
+                                     const size_t rsq) noexcept {
     const Coord rel{p-center};
     const double teta{atan2(rel.y, rel.x)},
     inverted_radius{rsq/sqrt(rel.x*rel.x+rel.y*rel.y)};
@@ -112,11 +112,10 @@ Transformation::Transformation(sf::Image&& png, std::vector<Coord>&& tmap)
 }
 
 Transformation& Transformation::transform(const TransParams& tp, Coord center) {
-    const Coord center_ = center;
-    const Cmplx a_ = tp.a, b_ = tp.b, c_ = tp.c, d_ = tp.d;
+    const Cmplx a = tp.a, b = tp.b, c = tp.c, d = tp.d;
     std::function<Coord(const Coord)> fun =
-            [center_, a_, b_, c_, d_](const Coord p) noexcept {
-        return __complex_transform(center_, p, a_, b_, c_, d_);
+            [center, a, b, c, d](const Coord p) noexcept {
+        return complex_transform(center, p, a, b, c, d);
     };
     auto result = work::static_work_balancer(tmap, fun, work::Num<3>());
     std::swap(tmap, result);
@@ -124,11 +123,10 @@ Transformation& Transformation::transform(const TransParams& tp, Coord center) {
 }
 
 Transformation& Transformation::invert(InvParams tp, Coord center) {
-    const Coord center_ = center;
     const size_t rsq = tp.radius*tp.radius;
     std::function<Coord(const Coord)> fun =
-            [center_, rsq](const Coord p) noexcept {
-        return __invert_transform(p, center_, rsq);
+            [center, rsq](const Coord p) noexcept {
+        return invert_transform(p, center, rsq);
     };
     auto result = work::static_work_balancer(tmap, fun);
     std::swap(tmap, result);
