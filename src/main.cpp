@@ -51,9 +51,8 @@ int main(int argc, char* argv[]) {
     }
     sf::Image image;
     image.loadFromFile(iname);
-
     if(!outopt) {
-        oname = iname + "-out.png";
+        oname = relative_filepath(iname) + "-out.png";
     }
     Transformation tr(std::move(image));
     if (transopt) {

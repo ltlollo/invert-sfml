@@ -75,5 +75,7 @@ std::enable_if_t<std::is_signed<T>::value, std::make_unsigned_t<T>
     return x > 0 ? x : -x;
 }
 
+std::string relative_filepath(const std::string& path);
+
 } // namespace fun
 #endif // UTILS_H
