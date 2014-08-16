@@ -84,8 +84,8 @@ int main(int argc, char* argv[]) {
         tr.transform(tp);
     } else if (coordopt) {
         const Coord center(xyr[0],xyr[1]);
-        const unsigned radius{absolute(xyr[2])};
-        tr.invert({radius}, center);
+        const InvParams radius{absolute(xyr[2])};
+        tr.invert(radius, center);
     } else {
         tr.invert();
     }
