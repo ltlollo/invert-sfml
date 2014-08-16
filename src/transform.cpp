@@ -192,7 +192,7 @@ Drawable Transformation::draw(const unsigned winx, const unsigned winy) const {
                     vertices.push_back(vc);
                     vertices.push_back(va);
                 }
-                if (quality>0 &&
+                if (quality &&
                     (inside(a, winx, winy) || inside(d, winx, winy) ||
                      inside(b, winx, winy))) {
                     vertices.push_back(va);
@@ -205,7 +205,7 @@ Drawable Transformation::draw(const unsigned winx, const unsigned winy) const {
                     vertices.push_back(vc);
                     vertices.push_back(vd);
                 }
-                if (quality>0 &&
+                if (quality &&
                     (inside(a, winx, winy) || inside(d, winx, winy) ||
                      inside(c, winx, winy))) {
                     vertices.push_back(va);
