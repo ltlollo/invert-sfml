@@ -2,7 +2,7 @@
 
 namespace tr {
 
-inline Coord __complex_transform(const Coord center, const Coord p,
+static inline Coord __complex_transform(const Coord center, const Coord p,
                                  const Cmplx a, const Cmplx b,
                                  const Cmplx c, const Cmplx d) noexcept {
     const Cmplx rel(p.x-center.x,p.y-center.y);
