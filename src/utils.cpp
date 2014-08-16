@@ -20,9 +20,6 @@ std::string relative_filepath(const std::string& path) {
     } else if (path[path.size()-1] == '/') {
         throw std::runtime_error("not a file");
     }
-    if (path[0] != '/') {
-        return path;
-    }
     auto pos = std::find(path.rbegin(), path.rend(), '/');
     if (pos == path.rend()) {
         return path;
