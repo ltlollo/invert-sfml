@@ -1,3 +1,2 @@
 - understand why the window is not vreated with the proper video mode the first time
 - allow window interaction?
-- fix the scripts
