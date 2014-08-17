@@ -6,16 +6,18 @@ using namespace fun;
 using namespace tr;
 using namespace sf;
 
+const auto print_help = []() {
+    printf("%s\n", help);
+};
+
 int main(int argc, char* argv[]) {
-    const auto print_help=[]() {
-        printf("%s\n", help);
-    };
     string oname, iname;
     array<int, 3> xyr;
     array<float, 8> t;
-    bool outopt{false}, showopt{false}, inopt{false}, coordopt{false},
-    transopt{false};
+    bool outopt{false}, showopt{false}, inopt{false}, invopt{false},
+    cmplxopt{false};
     int opt;
+
     while ((opt = getopt(argc, argv, "hso:i:c:t:")) != -1) {
         switch (opt) {
         case 's':
@@ -31,11 +33,11 @@ int main(int argc, char* argv[]) {
             break;
         case 'c':
             xyr = parse_coord<3, int>(string(optarg));
-            coordopt = true;
+            invopt = true;
             break;
         case 't':
             t = parse_coord<8, float>(string(optarg));
-            transopt = true;
+            cmplxopt = true;
             break;
         case 'h':
             print_help();
@@ -46,7 +48,7 @@ int main(int argc, char* argv[]) {
         }
     }
     if ((outopt && oname.empty()) || !inopt || iname.empty() ||
-        (showopt && outopt) || (transopt && coordopt) || optind != argc ) {
+        (showopt && outopt) || (cmplxopt && invopt) || optind != argc ) {
         print_help();
         return 1;
     }
@@ -56,10 +58,11 @@ int main(int argc, char* argv[]) {
         oname = relative_filepath(iname) + "-out.png";
     }
     Transformation tr(move(image));
-    if (transopt) {
-        const TransParams tp{{t[0],t[1]}, {t[2],t[3]}, {t[4],t[5]}, {t[6],t[7]}};
+    if (cmplxopt) {
+        const TransParams tp{{t[0], t[1]}, {t[2], t[3]},
+                             {t[4], t[5]}, {t[6], t[7]}};
         tr.transform(tp);
-    } else if (coordopt) {
+    } else if (invopt) {
         const Coord center(xyr[0],xyr[1]);
         const InvParams radius{absolute(xyr[2])};
         tr.invert(radius, center);

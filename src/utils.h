@@ -37,7 +37,7 @@ template<typename T> void getnum(const std::string& str, T& num) {
 
 template<unsigned N, typename T, char sepa = ','>
 std::array<T, N> parse_coord(const std::string& opt) {
-    static_assert(N>0, "cannot parse zero arguments");
+    static_assert(N > 0, "cannot parse zero arguments");
     static_assert(sepa == ','|| sepa == ':' || sepa == ';' || sepa == '#',
                   "unsupported separator");
     std::array<T, N> res;
