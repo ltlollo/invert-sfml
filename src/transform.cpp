@@ -47,7 +47,7 @@ Drawable::Drawable(T&& vertices, const unsigned x, const unsigned y,
     : vertices{std::forward<T>(vertices)}, vmode(x, y), BG{BG} {
 }
 
-void Drawable::show(const std::string title) const {
+void Drawable::show(const std::string& title) const {
     sf::Event event;
     sf::RenderWindow window;
     window.create(vmode, title);

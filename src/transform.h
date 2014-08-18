@@ -40,7 +40,7 @@ public:
     Drawable(T&& vertices, const unsigned x, const unsigned y,
              const sf::Color BG);
     void show() const;
-    void show(const std::string title) const;
+    void show(const std::string& title) const;
     void save(const std::string& fname) const &&;
 };
 
