@@ -93,7 +93,7 @@ Transformation::Transformation(const sf::Image& png) : png{png} {
     auto size = png.getSize();
     for (size_t y{0}; y < size.y; ++y) {
         for (size_t x{0}; x < size.x; ++x) {
-            tmap.push_back(Coord(x, y));
+            tmap.emplace_back(Coord(x, y));
         }
     }
 }
@@ -102,7 +102,7 @@ Transformation::Transformation(sf::Image&& png) : png{std::move(png)} {
     auto size = png.getSize();
     for (size_t y{0}; y < size.y; ++y) {
         for (size_t x{0}; x < size.x; ++x) {
-            tmap.push_back(Coord(x, y));
+            tmap.emplace_back(Coord(x, y));
         }
     }
 }
@@ -112,7 +112,7 @@ Transformation::Transformation(const std::string& file) {
     auto size = png.getSize();
     for (size_t y{0}; y < size.y; ++y) {
         for (size_t x{0}; x < size.x; ++x) {
-            tmap.push_back(Coord(x, y));
+            tmap.emplace_back(Coord(x, y));
         }
     }
 }

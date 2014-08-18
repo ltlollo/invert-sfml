@@ -25,7 +25,7 @@ constexpr typename std::enable_if<enable>::type mesure(T&& msg, P&& f,
                  (end - start).count() << "ms\n";
 }
 template<bool enable, typename T, typename P, typename... Args>
-constexpr typename std::enable_if<!enable>::type mesure(T&& msg, P&& f,
+constexpr typename std::enable_if<!enable>::type mesure(T&&, P&& f,
                                                         Args&&... args) {
     f(std::forward<Args>(args)...);
 }

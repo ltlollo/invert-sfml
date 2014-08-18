@@ -13,7 +13,7 @@
 namespace tr {
 
 constexpr unsigned aliasLvl{8};
-constexpr bool show_time{true}, show_size{true}, show_center{true},
+constexpr bool show_time{false}, show_size{true}, show_center{true},
 quality{true};
 
 using Coord = sf::Vector2f;
