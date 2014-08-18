@@ -48,10 +48,15 @@ Drawable::Drawable(T&& vertices, const unsigned x, const unsigned y,
 }
 
 void Drawable::show(const std::string& title) const {
+    const auto getTitle = [&]() {
+        return title + (show_size ? ", size: "+std::to_string(vmode.width)+'x'+
+                                    std::to_string(vmode.height): "");
+    };
+
     sf::Event event;
     sf::RenderWindow window;
-    window.create(vmode, title);
-    window.create(vmode, title);    // HACK
+    window.create(vmode, ""); // HACK, SFML needs this.
+    window.create(vmode, getTitle());
     window.clear(BG);
     paint(window);
     window.setFramerateLimit(20);

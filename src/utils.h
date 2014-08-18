@@ -14,19 +14,18 @@
 namespace fun {
 
 template<bool enable, typename T, typename P, typename... Args>
-constexpr typename std::enable_if<enable>::type mesure(T&& msg, P&& f,
-                                                       Args&&... args) {
-    std::chrono::time_point<std::chrono::high_resolution_clock> start, end;
-    start = std::chrono::high_resolution_clock::now();
+constexpr std::enable_if_t<enable> mesure(T&& msg, P&& f, Args&&... args) {
+    std::chrono::time_point<std::chrono::high_resolution_clock> start{
+        std::chrono::high_resolution_clock::now()};
     f(std::forward<Args>(args)...);
-    end = std::chrono::high_resolution_clock::now();
+    std::chrono::time_point<std::chrono::high_resolution_clock> end{
+        std::chrono::high_resolution_clock::now()};
     std::cerr << msg << " took: "
               << std::chrono::duration_cast<std::chrono::milliseconds>
                  (end - start).count() << "ms\n";
 }
 template<bool enable, typename T, typename P, typename... Args>
-constexpr typename std::enable_if<!enable>::type mesure(T&&, P&& f,
-                                                        Args&&... args) {
+constexpr std::enable_if_t<!enable> mesure(T&&, P&& f, Args&&... args) {
     f(std::forward<Args>(args)...);
 }
 
