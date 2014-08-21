@@ -44,11 +44,16 @@ public:
 };
 
 struct TransParams {
-    const Cmplx a, b, c, d;
+    Cmplx a, b, c, d;
+    TransParams fromArray(const std::array<float, 8>& arr) && {
+        a = {arr[0], arr[1]}; b = {arr[2], arr[3]}; c = {arr[4], arr[5]};
+        d = {arr[6], arr[7]};
+        return *this;
+    }
 };
 
 struct InvParams {
-    const size_t radius;
+    size_t radius;
 };
 
 class Transformation {
@@ -61,8 +66,8 @@ public:
     Transformation(const std::string& file);
     Transformation(sf::Image&& png, std::vector<Coord>&& tmap);
     Transformation& transform(const TransParams& tp, Coord center);
-    Transformation& invert(InvParams tp, Coord center);
     Transformation& transform(const TransParams& tp);
+    Transformation& invert(InvParams tp, Coord center);
     Transformation& invert(InvParams tp);
     Transformation& invert();
     Drawable draw(const unsigned winx, const unsigned winy) const;

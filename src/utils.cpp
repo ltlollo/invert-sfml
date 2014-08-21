@@ -14,7 +14,7 @@ template<>  void getnum<long>(const char* str, long& num) {
     num = atol(str);
 }
 
-std::string relative_filepath(const std::string& path) {
+std::string filename_from_path(const std::string& path) {
     if (path.empty()) {
         throw std::runtime_error("empty path");
     } else if (path[path.size()-1] == '/') {

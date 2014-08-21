@@ -52,16 +52,12 @@ int main(int argc, char* argv[]) {
         print_help();
         return 1;
     }
-    Image image;
-    image.loadFromFile(iname);
     if(!outopt) {
-        oname = relative_filepath(iname) + "-out.png";
+        oname = filename_from_path(iname) + "-out.png";
     }
-    Transformation tr(move(image));
+    Transformation tr(iname);
     if (cmplxopt) {
-        const TransParams tp{{t[0], t[1]}, {t[2], t[3]},
-                             {t[4], t[5]}, {t[6], t[7]}};
-        tr.transform(tp);
+        tr.transform(TransParams().fromArray(t));
     } else if (invopt) {
         const Coord center(xyr[0],xyr[1]);
         const InvParams radius{absolute(xyr[2])};
