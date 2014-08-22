@@ -34,7 +34,7 @@ template<typename T> T getnum(const std::string& str) noexcept {
     return getnum<T>(str.c_str());
 }
 
-template<typename T> void getnum(const char*, T& num) noexcept;
+template<typename T> void getnum(const char*, T&) noexcept;
 template<typename T> void getnum(const std::string& str, T& num) noexcept {
     getnum(str.c_str(), num);
 }

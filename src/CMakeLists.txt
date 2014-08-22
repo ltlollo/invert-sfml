@@ -39,8 +39,11 @@ add_executable(${EXECUTALBE_NAME} main.cpp)
 set(CMAKE_MODULE_PATH "/usr/share/SFML/cmake/Modules/;${CMAKE_MODULE_PATH}")
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules;${CMAKE_MODULE_PATH}")
 find_package(SFML 2 REQUIRED system window graphics)
+find_package(Work REQUIRED)
 
 include_directories(${SFML_INCLUDE_DIR})
+include_directories(${Work_INCLUDE_DIR})
+
 target_link_libraries(libtr ${SFML_LIBRARIES})
 target_link_libraries(${EXECUTALBE_NAME} libtr)
 target_link_libraries(libtr utils)

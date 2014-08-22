@@ -4,9 +4,9 @@
 #include <cmath>
 #include <complex>
 
-#include <SFML/Audio.hpp>
-#include <SFML/Graphics.hpp>
-#include <work/workers.h>
+#include "SFML/Audio.hpp"
+#include "SFML/Graphics.hpp"
+#include "work/workers.h"
 
 #include "utils.h"
 

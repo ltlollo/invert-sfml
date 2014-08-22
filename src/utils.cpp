@@ -2,15 +2,18 @@
 
 namespace fun {
 
-template<> void getnum<int>(const char* str, int& num) noexcept {
+template<>
+void getnum<int>(const char* str, int& num) noexcept {
     num = atoi(str);
 }
 
-template<> void getnum<float>(const char* str, float& num) noexcept {
+template<>
+void getnum<float>(const char* str, float& num) noexcept {
     num = atof(str);
 }
 
-template<> void getnum<long>(const char* str, long& num) noexcept {
+template<>
+void getnum<long>(const char* str, long& num) noexcept {
     num = atol(str);
 }
 
