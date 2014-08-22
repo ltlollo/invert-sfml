@@ -29,9 +29,14 @@ constexpr std::enable_if_t<!enable> mesure(T&&, P&& f, Args&&... args) {
     f(std::forward<Args>(args)...);
 }
 
-template<typename T> void getnum(const char*, T& num);
-template<typename T> void getnum(const std::string& str, T& num) {
-    return getnum(str.c_str(), num);
+template<typename T> T getnum(const char*) noexcept;
+template<typename T> T getnum(const std::string& str) noexcept {
+    return getnum<T>(str.c_str());
+}
+
+template<typename T> void getnum(const char*, T& num) noexcept;
+template<typename T> void getnum(const std::string& str, T& num) noexcept {
+    getnum(str.c_str(), num);
 }
 
 template<unsigned N, typename T, char sepa = ','>
@@ -64,7 +69,7 @@ std::array<T, N> parse_coord(const std::string& opt) {
     if (str.empty()) {
         throw std::runtime_error("empty arg " + std::to_string(pos));
     }
-    getnum(str, res[pos]);
+    getnum<T>(str, res[pos]);
     return res;
 }
 

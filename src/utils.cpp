@@ -2,16 +2,31 @@
 
 namespace fun {
 
-template<> void getnum<int>(const char* str, int& num) {
+template<> void getnum<int>(const char* str, int& num) noexcept {
     num = atoi(str);
 }
 
-template<> void getnum<float>(const char* str, float& num) {
+template<> void getnum<float>(const char* str, float& num) noexcept {
     num = atof(str);
 }
 
-template<>  void getnum<long>(const char* str, long& num) {
+template<> void getnum<long>(const char* str, long& num) noexcept {
     num = atol(str);
+}
+
+template<>
+int getnum<int>(const char* str) noexcept {
+    return atoi(str);
+}
+
+template<>
+float getnum<float>(const char* str) noexcept {
+    return atof(str);
+}
+
+template<>
+long getnum<long>(const char* str) noexcept {
+    return atol(str);
 }
 
 std::string filename_from_path(const std::string& path) {
