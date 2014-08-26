@@ -6,7 +6,7 @@ static inline Coord complex_transform(const Coord center, const Coord p,
                                       const Cmplx a, const Cmplx b,
                                       const Cmplx c, const Cmplx d) noexcept {
     const Cmplx rel(p.x-center.x,p.y-center.y);
-    auto res = (a*rel+b)/(c*rel+d);
+    const auto res = (a*rel+b)/(c*rel+d);
     return Coord(center.x+res.real(),center.y+res.imag());
 }
 
@@ -85,8 +85,8 @@ void Drawable::show() const {
 
 void Drawable::save(const std::string& fname) const && {
     sf::RenderWindow window;
+    window.create(vmode, ""); // HACK, SFML needs this
     window.create(vmode, "");
-    window.create(vmode, "");    // HACK
     window.clear(BG);
     paint(window);
     domesure("saving", [&]() {
@@ -137,6 +137,11 @@ Transformation& Transformation::transform(const TransParams& tp, Coord center) {
     return *this;
 }
 
+Transformation& Transformation::transform(const TransParams& tp) {
+    const Coord center{(float)png.getSize().x/2, (float)png.getSize().y/2};
+    return transform(tp, center);
+}
+
 Transformation& Transformation::invert(InvParams tp, Coord center) {
     const size_t rsq = tp.radius*tp.radius;
     std::function<Coord(const Coord)> fun =
@@ -156,16 +161,9 @@ Transformation& Transformation::invert(InvParams tp) {
 
 Transformation& Transformation::invert() {
     const unsigned x = png.getSize().x, y = png.getSize().y;
-    const unsigned radius = (x > y ? y/4 : y/4);
+    const unsigned radius = (x > y ? y/4 : x/4);
     return invert({radius});
 }
-
-
-Transformation& Transformation::transform(const TransParams& tp) {
-    const Coord center{(float)png.getSize().x/2, (float)png.getSize().y/2};
-    return transform(tp, center);
-}
-
 
 static inline sf::Color getBG(const sf::Image& png) noexcept {
     const size_t x  = png.getSize().x/2, y = png.getSize().x/2;
@@ -183,7 +181,6 @@ static inline bool outside(const Coord p, const unsigned x, const unsigned y)
 noexcept {
     return p.x < 0 || p.x > x || p.y < 0 || p.y > y;
 }
-
 
 static inline bool inside(const Coord p, const unsigned x, const unsigned y)
 noexcept {

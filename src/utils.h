@@ -69,7 +69,7 @@ std::array<T, N> parse_coord(const std::string& opt) {
     if (str.empty()) {
         throw std::runtime_error("empty arg " + std::to_string(pos));
     }
-    getnum<T>(str, res[pos]);
+    getnum(str, res[pos]);
     return res;
 }
 
