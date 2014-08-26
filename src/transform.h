@@ -12,9 +12,7 @@
 
 namespace tr {
 
-constexpr unsigned aliasLvl{8};
 constexpr bool show_time{false}, show_size{true}, quality{true};
-
 using Coord = sf::Vector2f;
 using Cmplx = std::complex<float>;
 

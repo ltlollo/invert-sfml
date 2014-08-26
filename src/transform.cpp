@@ -199,7 +199,6 @@ Drawable Transformation::draw(const unsigned winx, const unsigned winy) const {
                         vb(b, png.getPixel(x, y-1)),
                         vc(c, png.getPixel(x-1, y)),
                         vd(d, png.getPixel(x, y));
-
                 if (inside(b, winx, winy) || inside(c, winx, winy) ||
                     inside(a, winx, winy)) {
                     vertices.push_back(vb);
