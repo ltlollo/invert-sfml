@@ -49,8 +49,8 @@ Drawable::Drawable(T&& vertices, const unsigned x, const unsigned y,
 
 void Drawable::show(const std::string& title) const {
     const auto getTitle = [&]() {
-        return title + (show_size ? ", size: "+std::to_string(vmode.width)+'x'+
-                                    std::to_string(vmode.height): "");
+        return title + (show_size ? ", size: " + std::to_string(vmode.width) +
+                                    'x' + std::to_string(vmode.height): "");
     };
 
     sf::Event event;
@@ -138,7 +138,7 @@ Transformation& Transformation::transform(const TransParams& tp, Coord center) {
 }
 
 Transformation& Transformation::transform(const TransParams& tp) {
-    const Coord center{(float)png.getSize().x/2, (float)png.getSize().y/2};
+    const Coord center{png.getSize().x/2.f, png.getSize().y/2.f};
     return transform(tp, center);
 }
 
@@ -154,7 +154,7 @@ Transformation& Transformation::invert(InvParams tp, Coord center) {
 }
 
 Transformation& Transformation::invert(InvParams tp) {
-    const Coord center{(float)png.getSize().x/2, (float)png.getSize().y/2};
+    const Coord center{png.getSize().x/2.f, png.getSize().y/2.f};
     return invert(tp, center);
 }
 
