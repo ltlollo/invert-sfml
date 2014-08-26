@@ -127,9 +127,9 @@ Transformation::Transformation(sf::Image&& png, std::vector<Coord>&& tmap)
 }
 
 Transformation& Transformation::transform(const TransParams& tp, Coord center) {
-    const Cmplx a = tp.a, b = tp.b, c = tp.c, d = tp.d;
     std::function<Coord(const Coord)> fun =
-            [center, a, b, c, d](const Coord p) noexcept {
+            [center, a = tp.a, b = tp.b, c = tp.c, d = tp.d](const Coord p)
+            noexcept {
         return complex_transform(center, p, a, b, c, d);
     };
     auto result = work::static_work_balancer(tmap, fun, work::Num<3>());
@@ -143,9 +143,8 @@ Transformation& Transformation::transform(const TransParams& tp) {
 }
 
 Transformation& Transformation::invert(InvParams tp, Coord center) {
-    const size_t rsq = tp.radius*tp.radius;
     std::function<Coord(const Coord)> fun =
-            [center, rsq](const Coord p) noexcept {
+            [center, rsq = tp.radius*tp.radius](const Coord p) noexcept {
         return invert_transform(p, center, rsq);
     };
     auto result = work::static_work_balancer(tmap, fun, work::Num<3>());
