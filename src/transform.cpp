@@ -127,8 +127,7 @@ Transformation::Transformation(sf::Image&& png, std::vector<Coord>&& tmap)
 }
 
 Transformation& Transformation::transform(const TransParams& tp, Coord center) {
-    std::function<Coord(const Coord)> fun =
-            [center, a = tp.a, b = tp.b, c = tp.c, d = tp.d](const Coord p)
+    auto fun = [center, a = tp.a, b = tp.b, c = tp.c, d = tp.d](const Coord p)
             noexcept {
         return complex_transform(center, p, a, b, c, d);
     };
