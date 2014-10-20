@@ -3,7 +3,7 @@ set(CXX_FLAGS
     "-Wextra"
     "-Werror"
     "-pthread"
-    "-std=c++1y"
+    "-std=c++14"
     "-pedantic"
     "-fno-rtti"
     "-fPIE")
@@ -19,7 +19,7 @@ endif()
 set(OPT_FLAGS "-ffast-math -funroll-all-loops -march=native -Ofast")
 set(CMAKE_CXX_FLAGS_DEBUG "-O0 -g")
 set(CMAKE_CXX_FLAGS_MINSIZEREL "-Os -DNDEBUG -march=native ${LTO_FLAGS}")
-set(CMAKE_CXX_FLAGS_RELEASE "-Ofast -DNDEBUG ${OPT_FLAGS} ${LTO_FLAGS}")
+set(CMAKE_CXX_FLAGS_RELEASE "-DNDEBUG ${OPT_FLAGS} ${LTO_FLAGS}")
 set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g ${LTO_FLAGS}")
 
 set(CMAKE_SHARED_LINKER_FLAGS "-Wl,--no-undefined -O2 -fPIE")

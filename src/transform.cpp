@@ -142,8 +142,7 @@ Transformation& Transformation::transform(const TransParams& tp) {
 }
 
 Transformation& Transformation::invert(InvParams tp, Coord center) {
-    std::function<Coord(const Coord)> fun =
-            [center, rsq = tp.radius*tp.radius](const Coord p) noexcept {
+    auto fun = [center, rsq = tp.radius*tp.radius](const Coord p) noexcept {
         return invert_transform(p, center, rsq);
     };
     auto result = work::static_work_balancer(tmap, fun, work::Num<3>());
