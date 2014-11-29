@@ -29,7 +29,7 @@ static inline Coord another_trasform(const Coord p, const Coord center,
 }
 
 void Drawable::paint(sf::RenderWindow& window) const {
-    domesure("painting", [&]() {
+    domeasure("painting", [&]() {
         for (size_t i{0} ; i < vertices.size()/3; ++i) {
             window.draw(&vertices[i*3], 3, sf::Triangles);
         }
@@ -89,7 +89,7 @@ void Drawable::save(const std::string& fname) const && {
     window.create(vmode, "");
     window.clear(BG);
     paint(window);
-    domesure("saving", [&]() {
+    domeasure("saving", [&]() {
         window.capture().saveToFile(fname);
     });
 }
@@ -186,7 +186,7 @@ noexcept {
 
 Drawable Transformation::draw(const unsigned winx, const unsigned winy) const {
     std::vector<sf::Vertex> vertices;
-    domesure("transforming", [&]() {
+    domeasure("transforming", [&]() {
         for (size_t y{1}; y < png.getSize().y; ++y) {
             for (size_t x{1}; x < png.getSize().x; ++x) {
                 auto a = tmap[x-1+(y-1)*png.getSize().x];

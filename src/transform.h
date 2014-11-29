@@ -17,8 +17,8 @@ using Coord = sf::Vector2f;
 using Cmplx = std::complex<float>;
 
 template<typename T, typename P, typename... Args>
-constexpr auto domesure(T&& msg, P&& f, Args&&... args) {
-    return fun::mesure<show_time, T, Args...>(std::forward<T>(msg),
+constexpr auto domeasure(T&& msg, P&& f, Args&&... args) {
+    return fun::measure<show_time, T, Args...>(std::forward<T>(msg),
                                               std::forward<P>(f),
                                               std::forward<Args>(args)...);
 }
