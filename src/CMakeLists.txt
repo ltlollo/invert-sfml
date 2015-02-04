@@ -41,8 +41,8 @@ set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules;${CMAKE_MODULE_PATH}")
 find_package(SFML 2 REQUIRED system window graphics)
 include_directories(${SFML_INCLUDE_DIR})
 
-find_package(Work REQUIRED)
-include_directories(${Work_INCLUDE_DIR})
+find_package(Extra REQUIRED)
+include_directories(${Extra_INCLUDE_DIR})
 
 target_link_libraries(libtr ${SFML_LIBRARIES})
 target_link_libraries(libtr utils)

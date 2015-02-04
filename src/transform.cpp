@@ -29,7 +29,7 @@ static inline Coord another_trasform(const Coord p, const Coord center,
 }
 
 void Drawable::paint(sf::RenderWindow& window) const {
-    domeasure("painting", [&]() {
+    fun::Bencher("painting", [&]() {
         for (size_t i{0} ; i < vertices.size()/3; ++i) {
             window.draw(&vertices[i*3], 3, sf::Triangles);
         }
@@ -89,7 +89,7 @@ void Drawable::save(const std::string& fname) const && {
     window.create(vmode, "");
     window.clear(BG);
     paint(window);
-    domeasure("saving", [&]() {
+    fun::Bencher("saving", [&]() {
         window.capture().saveToFile(fname);
     });
 }
@@ -131,7 +131,7 @@ Transformation& Transformation::transform(const TransParams& tp, Coord center) {
             noexcept {
         return complex_transform(center, p, a, b, c, d);
     };
-    auto result = work::static_work_balancer(tmap, fun, work::Num<3>());
+    auto result = task::Parallel<4>::collect(tmap, fun);
     std::swap(tmap, result);
     return *this;
 }
@@ -145,7 +145,7 @@ Transformation& Transformation::invert(InvParams tp, Coord center) {
     auto fun = [center, rsq = tp.radius*tp.radius](const Coord p) noexcept {
         return invert_transform(p, center, rsq);
     };
-    auto result = work::static_work_balancer(tmap, fun, work::Num<3>());
+    auto result = task::Parallel<4>::collect(tmap, fun);
     std::swap(tmap, result);
     return *this;
 }
@@ -186,7 +186,7 @@ noexcept {
 
 Drawable Transformation::draw(const unsigned winx, const unsigned winy) const {
     std::vector<sf::Vertex> vertices;
-    domeasure("transforming", [&]() {
+    fun::Bencher("transforming", [&]() {
         for (size_t y{1}; y < png.getSize().y; ++y) {
             for (size_t x{1}; x < png.getSize().x; ++x) {
                 auto a = tmap[x-1+(y-1)*png.getSize().x];

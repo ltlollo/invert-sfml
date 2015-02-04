@@ -13,22 +13,6 @@
 
 namespace fun {
 
-template<bool enable, typename T, typename P, typename... Args>
-constexpr std::enable_if_t<enable> measure(T&& msg, P&& f, Args&&... args) {
-    std::chrono::time_point<std::chrono::high_resolution_clock> start{
-        std::chrono::high_resolution_clock::now()};
-    f(std::forward<Args>(args)...);
-    std::chrono::time_point<std::chrono::high_resolution_clock> end{
-        std::chrono::high_resolution_clock::now()};
-    std::cerr << msg << " took: "
-              << std::chrono::duration_cast<std::chrono::milliseconds>
-                 (end - start).count() << "ms\n";
-}
-template<bool enable, typename T, typename P, typename... Args>
-constexpr std::enable_if_t<!enable> measure(T&&, P&& f, Args&&... args) {
-    f(std::forward<Args>(args)...);
-}
-
 template<typename T> T getnum(const char*) noexcept;
 template<typename T> T getnum(const std::string& str) noexcept {
     return getnum<T>(str.c_str());

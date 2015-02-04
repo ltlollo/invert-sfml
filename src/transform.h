@@ -6,8 +6,8 @@
 
 #include "SFML/Audio.hpp"
 #include "SFML/Graphics.hpp"
-#include "work/workers.h"
-
+#include <extra/task.h>
+#include <extra/utils.h>
 #include "utils.h"
 
 namespace tr {
@@ -15,13 +15,6 @@ namespace tr {
 constexpr bool show_time{false}, show_size{true}, quality{true};
 using Coord = sf::Vector2f;
 using Cmplx = std::complex<float>;
-
-template<typename T, typename P, typename... Args>
-constexpr auto domeasure(T&& msg, P&& f, Args&&... args) {
-    return fun::measure<show_time, T, Args...>(std::forward<T>(msg),
-                                              std::forward<P>(f),
-                                              std::forward<Args>(args)...);
-}
 
 class Drawable {
     std::vector<sf::Vertex> vertices;
