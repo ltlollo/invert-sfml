@@ -57,12 +57,6 @@ std::array<T, N> parse_coord(const std::string& opt) {
     return res;
 }
 
-template<typename T>
-std::enable_if_t<std::is_signed<T>::value, std::make_unsigned_t<T>
-> absolute(const T x) {
-    return x > 0 ? x : -x;
-}
-
 std::string filename_from_path(const std::string& path);
 
 } // namespace fun

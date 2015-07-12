@@ -60,7 +60,7 @@ int main(int argc, char* argv[]) {
         tr.transform(TransParams().fromArray(t));
     } else if (invopt) {
         const Coord center(xyr[0],xyr[1]);
-        const InvParams radius{absolute(xyr[2])};
+        const InvParams radius{size_t(abs(xyr[2]))};
         tr.invert(radius, center);
     } else {
         tr.invert();
